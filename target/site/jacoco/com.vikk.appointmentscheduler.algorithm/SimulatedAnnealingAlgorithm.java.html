@@ -77,9 +77,9 @@ public class SimulatedAnnealingAlgorithm implements SchedulingAlgorithm {
 <span class="fc" id="L77">                currentEnergy = neighborEnergy;</span>
                 
                 // Update best solution if improved
-<span class="pc bpc" id="L80" title="1 of 2 branches missed.">                if (currentEnergy &lt; bestEnergy) {</span>
-<span class="nc" id="L81">                    bestSolution = new HashMap&lt;&gt;(currentSolution);</span>
-<span class="nc" id="L82">                    bestEnergy = currentEnergy;</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">                if (currentEnergy &lt; bestEnergy) {</span>
+<span class="fc" id="L81">                    bestSolution = new HashMap&lt;&gt;(currentSolution);</span>
+<span class="fc" id="L82">                    bestEnergy = currentEnergy;</span>
                 }
             }
             

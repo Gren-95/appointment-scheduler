@@ -30,174 +30,185 @@ public class Appointment {
     private double importanceScore;
     private AppointmentStatus status;
 
-<span class="fc" id="L33">    public Appointment() {</span>
-<span class="fc" id="L34">        this.requiredCapabilities = new HashSet&lt;&gt;();</span>
-<span class="fc" id="L35">        this.preferredCapabilities = new HashSet&lt;&gt;();</span>
-<span class="fc" id="L36">        this.conflicts = new HashSet&lt;&gt;();</span>
-<span class="fc" id="L37">        this.isFlexible = false;</span>
-<span class="fc" id="L38">        this.flexibilityWindow = Duration.ZERO;</span>
-<span class="fc" id="L39">        this.importanceScore = 1.0;</span>
-<span class="fc" id="L40">    }</span>
+    /**
+     * Default constructor that initializes the appointment with default values.
+     */
+<span class="fc" id="L36">    public Appointment() {</span>
+<span class="fc" id="L37">        this.requiredCapabilities = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L38">        this.preferredCapabilities = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L39">        this.conflicts = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L40">        this.isFlexible = false;</span>
+<span class="fc" id="L41">        this.flexibilityWindow = Duration.ZERO;</span>
+<span class="fc" id="L42">        this.importanceScore = 1.0;</span>
+<span class="fc" id="L43">    }</span>
 
+    /**
+     * Constructor that creates an appointment with the specified parameters.
+     *
+     * @param id the unique identifier for the appointment
+     * @param title the title of the appointment
+     * @param startTime the start time of the appointment
+     * @param duration the duration of the appointment
+     */
     public Appointment(String id, String title, LocalDateTime startTime, Duration duration) {
-<span class="fc" id="L43">        this();</span>
-<span class="fc" id="L44">        this.id = id;</span>
-<span class="fc" id="L45">        this.title = title;</span>
-<span class="fc" id="L46">        this.startTime = startTime;</span>
-<span class="fc" id="L47">        this.duration = duration;</span>
-<span class="fc" id="L48">        this.endTime = startTime.plus(duration);</span>
-<span class="fc" id="L49">    }</span>
+<span class="fc" id="L54">        this();</span>
+<span class="fc" id="L55">        this.id = id;</span>
+<span class="fc" id="L56">        this.title = title;</span>
+<span class="fc" id="L57">        this.startTime = startTime;</span>
+<span class="fc" id="L58">        this.duration = duration;</span>
+<span class="fc" id="L59">        this.endTime = startTime.plus(duration);</span>
+<span class="fc" id="L60">    }</span>
 
     // Getters and setters
     public String getId() {
-<span class="fc" id="L53">        return id;</span>
+<span class="fc" id="L64">        return id;</span>
     }
 
     public void setId(String id) {
-<span class="fc" id="L57">        this.id = id;</span>
-<span class="fc" id="L58">    }</span>
+<span class="fc" id="L68">        this.id = id;</span>
+<span class="fc" id="L69">    }</span>
 
     public String getTitle() {
-<span class="fc" id="L61">        return title;</span>
+<span class="fc" id="L72">        return title;</span>
     }
 
     public void setTitle(String title) {
-<span class="fc" id="L65">        this.title = title;</span>
-<span class="fc" id="L66">    }</span>
+<span class="fc" id="L76">        this.title = title;</span>
+<span class="fc" id="L77">    }</span>
 
     public String getDescription() {
-<span class="fc" id="L69">        return description;</span>
+<span class="fc" id="L80">        return description;</span>
     }
 
     public void setDescription(String description) {
-<span class="fc" id="L73">        this.description = description;</span>
-<span class="fc" id="L74">    }</span>
+<span class="fc" id="L84">        this.description = description;</span>
+<span class="fc" id="L85">    }</span>
 
     @JsonFormat(pattern = &quot;yyyy-MM-dd'T'HH:mm:ss&quot;)
     public LocalDateTime getStartTime() {
-<span class="fc" id="L78">        return startTime;</span>
+<span class="fc" id="L89">        return startTime;</span>
     }
 
     public void setStartTime(LocalDateTime startTime) {
-<span class="fc" id="L82">        this.startTime = startTime;</span>
-<span class="fc bfc" id="L83" title="All 2 branches covered.">        if (duration != null) {</span>
-<span class="fc" id="L84">            this.endTime = startTime.plus(duration);</span>
+<span class="fc" id="L93">        this.startTime = startTime;</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">        if (duration != null) {</span>
+<span class="fc" id="L95">            this.endTime = startTime.plus(duration);</span>
         }
-<span class="fc" id="L86">    }</span>
+<span class="fc" id="L97">    }</span>
 
     @JsonFormat(pattern = &quot;yyyy-MM-dd'T'HH:mm:ss&quot;)
     public LocalDateTime getEndTime() {
-<span class="fc" id="L90">        return endTime;</span>
+<span class="fc" id="L101">        return endTime;</span>
     }
 
     public void setEndTime(LocalDateTime endTime) {
-<span class="fc" id="L94">        this.endTime = endTime;</span>
-<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if (startTime != null) {</span>
-<span class="fc" id="L96">            this.duration = Duration.between(startTime, endTime);</span>
-        }
-<span class="fc" id="L98">    }</span>
-
-    public Duration getDuration() {
-<span class="fc" id="L101">        return duration;</span>
-    }
-
-    public void setDuration(Duration duration) {
-<span class="fc" id="L105">        this.duration = duration;</span>
+<span class="fc" id="L105">        this.endTime = endTime;</span>
 <span class="pc bpc" id="L106" title="1 of 2 branches missed.">        if (startTime != null) {</span>
-<span class="fc" id="L107">            this.endTime = startTime.plus(duration);</span>
+<span class="fc" id="L107">            this.duration = Duration.between(startTime, endTime);</span>
         }
 <span class="fc" id="L109">    }</span>
 
+    public Duration getDuration() {
+<span class="fc" id="L112">        return duration;</span>
+    }
+
+    public void setDuration(Duration duration) {
+<span class="fc" id="L116">        this.duration = duration;</span>
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">        if (startTime != null) {</span>
+<span class="fc" id="L118">            this.endTime = startTime.plus(duration);</span>
+        }
+<span class="fc" id="L120">    }</span>
+
     public String getResourceId() {
-<span class="fc" id="L112">        return resourceId;</span>
+<span class="fc" id="L123">        return resourceId;</span>
     }
 
     public void setResourceId(String resourceId) {
-<span class="fc" id="L116">        this.resourceId = resourceId;</span>
-<span class="fc" id="L117">    }</span>
+<span class="fc" id="L127">        this.resourceId = resourceId;</span>
+<span class="fc" id="L128">    }</span>
 
     public String getClientId() {
-<span class="fc" id="L120">        return clientId;</span>
+<span class="fc" id="L131">        return clientId;</span>
     }
 
     public void setClientId(String clientId) {
-<span class="fc" id="L124">        this.clientId = clientId;</span>
-<span class="fc" id="L125">    }</span>
+<span class="fc" id="L135">        this.clientId = clientId;</span>
+<span class="fc" id="L136">    }</span>
 
     public AppointmentType getType() {
-<span class="fc" id="L128">        return type;</span>
+<span class="fc" id="L139">        return type;</span>
     }
 
     public void setType(AppointmentType type) {
-<span class="fc" id="L132">        this.type = type;</span>
-<span class="fc" id="L133">    }</span>
+<span class="fc" id="L143">        this.type = type;</span>
+<span class="fc" id="L144">    }</span>
 
     public Priority getPriority() {
-<span class="fc" id="L136">        return priority;</span>
+<span class="fc" id="L147">        return priority;</span>
     }
 
     public void setPriority(Priority priority) {
-<span class="fc" id="L140">        this.priority = priority;</span>
-<span class="fc" id="L141">    }</span>
+<span class="fc" id="L151">        this.priority = priority;</span>
+<span class="fc" id="L152">    }</span>
 
     public Set&lt;String&gt; getRequiredCapabilities() {
-<span class="fc" id="L144">        return requiredCapabilities;</span>
+<span class="fc" id="L155">        return requiredCapabilities;</span>
     }
 
     public void setRequiredCapabilities(Set&lt;String&gt; requiredCapabilities) {
-<span class="fc" id="L148">        this.requiredCapabilities = requiredCapabilities;</span>
-<span class="fc" id="L149">    }</span>
+<span class="fc" id="L159">        this.requiredCapabilities = requiredCapabilities;</span>
+<span class="fc" id="L160">    }</span>
 
     public Set&lt;String&gt; getPreferredCapabilities() {
-<span class="fc" id="L152">        return preferredCapabilities;</span>
+<span class="fc" id="L163">        return preferredCapabilities;</span>
     }
 
     public void setPreferredCapabilities(Set&lt;String&gt; preferredCapabilities) {
-<span class="fc" id="L156">        this.preferredCapabilities = preferredCapabilities;</span>
-<span class="fc" id="L157">    }</span>
+<span class="fc" id="L167">        this.preferredCapabilities = preferredCapabilities;</span>
+<span class="fc" id="L168">    }</span>
 
     public boolean isFlexible() {
-<span class="fc" id="L160">        return isFlexible;</span>
+<span class="fc" id="L171">        return isFlexible;</span>
     }
 
     public void setFlexible(boolean flexible) {
-<span class="fc" id="L164">        isFlexible = flexible;</span>
-<span class="fc" id="L165">    }</span>
+<span class="fc" id="L175">        isFlexible = flexible;</span>
+<span class="fc" id="L176">    }</span>
 
     public Duration getFlexibilityWindow() {
-<span class="fc" id="L168">        return flexibilityWindow;</span>
+<span class="fc" id="L179">        return flexibilityWindow;</span>
     }
 
     public void setFlexibilityWindow(Duration flexibilityWindow) {
-<span class="fc" id="L172">        this.flexibilityWindow = flexibilityWindow;</span>
-<span class="fc" id="L173">    }</span>
+<span class="fc" id="L183">        this.flexibilityWindow = flexibilityWindow;</span>
+<span class="fc" id="L184">    }</span>
 
     public Set&lt;String&gt; getConflicts() {
-<span class="fc" id="L176">        return conflicts;</span>
+<span class="fc" id="L187">        return conflicts;</span>
     }
 
     public void setConflicts(Set&lt;String&gt; conflicts) {
-<span class="fc" id="L180">        this.conflicts = conflicts;</span>
-<span class="fc" id="L181">    }</span>
+<span class="fc" id="L191">        this.conflicts = conflicts;</span>
+<span class="fc" id="L192">    }</span>
 
     public double getImportanceScore() {
-<span class="fc" id="L184">        return importanceScore;</span>
+<span class="fc" id="L195">        return importanceScore;</span>
     }
 
     public void setImportanceScore(double importanceScore) {
-<span class="fc" id="L188">        this.importanceScore = importanceScore;</span>
-<span class="fc" id="L189">    }</span>
+<span class="fc" id="L199">        this.importanceScore = importanceScore;</span>
+<span class="fc" id="L200">    }</span>
 
     public AppointmentStatus getStatus() {
-<span class="fc" id="L192">        return status;</span>
+<span class="fc" id="L203">        return status;</span>
     }
 
     public void setStatus(AppointmentStatus status) {
-<span class="fc" id="L196">        this.status = status;</span>
-<span class="fc" id="L197">    }</span>
+<span class="fc" id="L207">        this.status = status;</span>
+<span class="fc" id="L208">    }</span>
 
     public long getDurationMinutes() {
-<span class="pc bpc" id="L200" title="1 of 2 branches missed.">        return duration != null ? duration.toMinutes() : 0;</span>
+<span class="pc bpc" id="L211" title="1 of 2 branches missed.">        return duration != null ? duration.toMinutes() : 0;</span>
     }
 
     /**
@@ -205,59 +216,63 @@ public class Appointment {
      * Two appointments conflict if they have overlapping time slots.
      */
     public boolean conflictsWith(Appointment other) {
-<span class="fc bfc" id="L208" title="All 4 branches covered.">        if (other == null || this.id.equals(other.id)) {</span>
-<span class="fc" id="L209">            return false;</span>
+<span class="fc bfc" id="L219" title="All 4 branches covered.">        if (other == null || this.id.equals(other.id)) {</span>
+<span class="fc" id="L220">            return false;</span>
         }
         
-<span class="fc bfc" id="L212" title="All 2 branches covered.">        return this.startTime.isBefore(other.endTime) &amp;&amp; </span>
-<span class="fc bfc" id="L213" title="All 2 branches covered.">               this.endTime.isAfter(other.startTime);</span>
+<span class="fc bfc" id="L223" title="All 2 branches covered.">        return this.startTime.isBefore(other.endTime) &amp;&amp; </span>
+<span class="fc bfc" id="L224" title="All 2 branches covered.">               this.endTime.isAfter(other.startTime);</span>
     }
 
     /**
      * Checks if this appointment can be scheduled at the given time.
      */
     public boolean canBeScheduledAt(LocalDateTime newStartTime) {
-<span class="fc bfc" id="L220" title="All 2 branches covered.">        if (!isFlexible) {</span>
-<span class="fc" id="L221">            return this.startTime.equals(newStartTime);</span>
+<span class="fc bfc" id="L231" title="All 2 branches covered.">        if (!isFlexible) {</span>
+<span class="fc" id="L232">            return this.startTime.equals(newStartTime);</span>
         }
         
-<span class="fc" id="L224">        LocalDateTime earliestStart = this.startTime.minus(flexibilityWindow);</span>
-<span class="fc" id="L225">        LocalDateTime latestStart = this.startTime.plus(flexibilityWindow);</span>
+<span class="fc" id="L235">        LocalDateTime earliestStart = this.startTime.minus(flexibilityWindow);</span>
+<span class="fc" id="L236">        LocalDateTime latestStart = this.startTime.plus(flexibilityWindow);</span>
         
-<span class="pc bpc" id="L227" title="1 of 2 branches missed.">        return !newStartTime.isBefore(earliestStart) &amp;&amp; </span>
-<span class="pc bpc" id="L228" title="1 of 2 branches missed.">               !newStartTime.isAfter(latestStart);</span>
+<span class="pc bpc" id="L238" title="1 of 2 branches missed.">        return !newStartTime.isBefore(earliestStart) &amp;&amp; </span>
+<span class="pc bpc" id="L239" title="1 of 2 branches missed.">               !newStartTime.isAfter(latestStart);</span>
     }
 
     /**
      * Calculates the total score for this appointment based on priority and importance.
      */
     public double calculateScore() {
-<span class="pc bpc" id="L235" title="1 of 5 branches missed.">        double priorityMultiplier = switch (priority) {</span>
-<span class="fc" id="L236">            case LOW -&gt; 1.0;</span>
-<span class="fc" id="L237">            case MEDIUM -&gt; 1.5;</span>
-<span class="fc" id="L238">            case HIGH -&gt; 2.0;</span>
-<span class="fc" id="L239">            case URGENT -&gt; 3.0;</span>
+<span class="pc bpc" id="L246" title="1 of 5 branches missed.">        double priorityMultiplier = switch (priority) {</span>
+<span class="fc" id="L247">            case LOW -&gt; 1.0;</span>
+<span class="fc" id="L248">            case MEDIUM -&gt; 1.5;</span>
+<span class="fc" id="L249">            case HIGH -&gt; 2.0;</span>
+<span class="fc" id="L250">            case URGENT -&gt; 3.0;</span>
         };
         
-<span class="fc" id="L242">        return importanceScore * priorityMultiplier;</span>
+<span class="fc" id="L253">        return importanceScore * priorityMultiplier;</span>
     }
 
     @Override
     public boolean equals(Object o) {
-<span class="fc bfc" id="L247" title="All 2 branches covered.">        if (this == o) return true;</span>
-<span class="fc bfc" id="L248" title="All 4 branches covered.">        if (o == null || getClass() != o.getClass()) return false;</span>
-<span class="fc" id="L249">        Appointment that = (Appointment) o;</span>
-<span class="fc" id="L250">        return Objects.equals(id, that.id);</span>
+<span class="fc bfc" id="L258" title="All 2 branches covered.">        if (this == o) {</span>
+<span class="fc" id="L259">            return true;</span>
+        }
+<span class="fc bfc" id="L261" title="All 4 branches covered.">        if (o == null || getClass() != o.getClass()) {</span>
+<span class="fc" id="L262">            return false;</span>
+        }
+<span class="fc" id="L264">        Appointment that = (Appointment) o;</span>
+<span class="fc" id="L265">        return Objects.equals(id, that.id);</span>
     }
 
     @Override
     public int hashCode() {
-<span class="fc" id="L255">        return Objects.hash(id);</span>
+<span class="fc" id="L270">        return Objects.hash(id);</span>
     }
 
     @Override
     public String toString() {
-<span class="fc" id="L260">        return &quot;Appointment{&quot; +</span>
+<span class="fc" id="L275">        return &quot;Appointment{&quot; +</span>
                 &quot;id='&quot; + id + '\'' +
                 &quot;, title='&quot; + title + '\'' +
                 &quot;, startTime=&quot; + startTime +

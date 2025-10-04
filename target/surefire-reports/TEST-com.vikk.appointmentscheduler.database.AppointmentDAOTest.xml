@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.vikk.appointmentscheduler.database.AppointmentDAOTest" time="0.238" tests="11" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.vikk.appointmentscheduler.database.AppointmentDAOTest" time="0.23" tests="11" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="21"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -13,7 +13,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="US"/>
     <property name="sun.boot.library.path" value="/usr/lib/jvm/java-21-openjdk/lib"/>
-    <property name="sun.java.command" value="/mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/target/surefire/surefirebooter-20251004173254172_3.jar /mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/target/surefire 2025-10-04T17-32-54_129-jvmRun1 surefire-20251004173254172_1tmp surefire_0-20251004173254172_2tmp"/>
+    <property name="sun.java.command" value="/mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/target/surefire/surefirebooter-20251004174347258_3.jar /mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/target/surefire 2025-10-04T17-43-47_196-jvmRun1 surefire-20251004174347258_1tmp surefire_0-20251004174347258_2tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="/mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/target/test-classes:/mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/target/classes:/home/ghost/.m2/repository/com/google/guava/guava/31.1-jre/guava-31.1-jre.jar:/home/ghost/.m2/repository/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar:/home/ghost/.m2/repository/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar:/home/ghost/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar:/home/ghost/.m2/repository/org/checkerframework/checker-qual/3.12.0/checker-qual-3.12.0.jar:/home/ghost/.m2/repository/com/google/errorprone/error_prone_annotations/2.11.0/error_prone_annotations-2.11.0.jar:/home/ghost/.m2/repository/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar:/home/ghost/.m2/repository/org/apache/commons/commons-lang3/3.12.0/commons-lang3-3.12.0.jar:/home/ghost/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.15.2/jackson-databind-2.15.2.jar:/home/ghost/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.15.2/jackson-annotations-2.15.2.jar:/home/ghost/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2.jar:/home/ghost/.m2/repository/org/openjfx/javafx-controls/17.0.2/javafx-controls-17.0.2.jar:/home/ghost/.m2/repository/org/openjfx/javafx-controls/17.0.2/javafx-controls-17.0.2-linux.jar:/home/ghost/.m2/repository/org/openjfx/javafx-graphics/17.0.2/javafx-graphics-17.0.2.jar:/home/ghost/.m2/repository/org/openjfx/javafx-graphics/17.0.2/javafx-graphics-17.0.2-linux.jar:/home/ghost/.m2/repository/org/openjfx/javafx-base/17.0.2/javafx-base-17.0.2.jar:/home/ghost/.m2/repository/org/openjfx/javafx-base/17.0.2/javafx-base-17.0.2-linux.jar:/home/ghost/.m2/repository/org/openjfx/javafx-fxml/17.0.2/javafx-fxml-17.0.2.jar:/home/ghost/.m2/repository/org/openjfx/javafx-fxml/17.0.2/javafx-fxml-17.0.2-linux.jar:/home/ghost/.m2/repository/org/openjfx/javafx-swing/17.0.2/javafx-swing-17.0.2.jar:/home/ghost/.m2/repository/org/openjfx/javafx-swing/17.0.2/javafx-swing-17.0.2-linux.jar:/home/ghost/.m2/repository/org/xerial/sqlite-jdbc/3.44.1.0/sqlite-jdbc-3.44.1.0.jar:/home/ghost/.m2/repository/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar:/home/ghost/.m2/repository/com/h2database/h2/2.2.224/h2-2.2.224.jar:/home/ghost/.m2/repository/org/junit/jupiter/junit-jupiter/5.9.3/junit-jupiter-5.9.3.jar:/home/ghost/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.9.3/junit-jupiter-api-5.9.3.jar:/home/ghost/.m2/repository/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar:/home/ghost/.m2/repository/org/junit/platform/junit-platform-commons/1.9.3/junit-platform-commons-1.9.3.jar:/home/ghost/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/ghost/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.9.3/junit-jupiter-params-5.9.3.jar:/home/ghost/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.9.3/junit-jupiter-engine-5.9.3.jar:/home/ghost/.m2/repository/org/junit/platform/junit-platform-engine/1.9.3/junit-platform-engine-1.9.3.jar:/home/ghost/.m2/repository/org/mockito/mockito-core/5.3.1/mockito-core-5.3.1.jar:/home/ghost/.m2/repository/net/bytebuddy/byte-buddy/1.14.4/byte-buddy-1.14.4.jar:/home/ghost/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.4/byte-buddy-agent-1.14.4.jar:/home/ghost/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/ghost/.m2/repository/org/mockito/mockito-junit-jupiter/5.3.1/mockito-junit-jupiter-5.3.1.jar:/home/ghost/.m2/repository/org/assertj/assertj-core/3.24.2/assertj-core-3.24.2.jar:"/>
     <property name="sun.cpu.endian" value="little"/>
@@ -28,7 +28,7 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
-    <property name="surefire.real.class.path" value="/mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/target/surefire/surefirebooter-20251004173254172_3.jar"/>
+    <property name="surefire.real.class.path" value="/mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/target/surefire/surefirebooter-20251004174347258_3.jar"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="21.0.8+9"/>
     <property name="user.name" value="ghost"/>
@@ -55,116 +55,116 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="65.0"/>
   </properties>
-  <testcase name="testDifferentAppointmentTypes" classname="com.vikk.appointmentscheduler.database.AppointmentDAOTest" time="0.036">
-    <system-err><![CDATA[Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
+  <testcase name="testDifferentAppointmentTypes" classname="com.vikk.appointmentscheduler.database.AppointmentDAOTest" time="0.027">
+    <system-err><![CDATA[Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
 INFO: Deleted all appointments
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
+Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
 INFO: Saved appointment: CONSULT001
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
+Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
 INFO: Saved appointment: EMERG001
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
+Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
 INFO: Saved appointment: SURG001
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
+Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
 INFO: Deleted all appointments
 ]]></system-err>
   </testcase>
   <testcase name="testFindNonExistentAppointment" classname="com.vikk.appointmentscheduler.database.AppointmentDAOTest" time="0.012">
-    <system-err><![CDATA[Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
+    <system-err><![CDATA[Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
 INFO: Deleted all appointments
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
+Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
 INFO: Deleted all appointments
 ]]></system-err>
   </testcase>
   <testcase name="testFindAll" classname="com.vikk.appointmentscheduler.database.AppointmentDAOTest" time="0.026">
-    <system-err><![CDATA[Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
+    <system-err><![CDATA[Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
 INFO: Deleted all appointments
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
+Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
 INFO: Saved appointment: TEST003
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
+Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
 INFO: Saved appointment: TEST004
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
+Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
 INFO: Saved appointment: TEST005
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
+Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
 INFO: Deleted all appointments
 ]]></system-err>
   </testcase>
-  <testcase name="testUpdateAppointment" classname="com.vikk.appointmentscheduler.database.AppointmentDAOTest" time="0.02">
-    <system-err><![CDATA[Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
+  <testcase name="testUpdateAppointment" classname="com.vikk.appointmentscheduler.database.AppointmentDAOTest" time="0.021">
+    <system-err><![CDATA[Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
 INFO: Deleted all appointments
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
+Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
 INFO: Saved appointment: TEST006
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO update
+Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO update
 INFO: Updated appointment: TEST006
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
+Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
 INFO: Deleted all appointments
 ]]></system-err>
   </testcase>
-  <testcase name="testSaveAppointment" classname="com.vikk.appointmentscheduler.database.AppointmentDAOTest" time="0.017">
-    <system-err><![CDATA[Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
+  <testcase name="testSaveAppointment" classname="com.vikk.appointmentscheduler.database.AppointmentDAOTest" time="0.016">
+    <system-err><![CDATA[Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
 INFO: Deleted all appointments
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
+Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
 INFO: Saved appointment: TEST001
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
+Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
 INFO: Deleted all appointments
 ]]></system-err>
   </testcase>
-  <testcase name="testFindById" classname="com.vikk.appointmentscheduler.database.AppointmentDAOTest" time="0.017">
-    <system-err><![CDATA[Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
+  <testcase name="testFindById" classname="com.vikk.appointmentscheduler.database.AppointmentDAOTest" time="0.016">
+    <system-err><![CDATA[Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
 INFO: Deleted all appointments
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
+Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
 INFO: Saved appointment: TEST002
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
+Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
 INFO: Deleted all appointments
 ]]></system-err>
   </testcase>
   <testcase name="testAppointmentWithCapabilities" classname="com.vikk.appointmentscheduler.database.AppointmentDAOTest" time="0.027">
-    <system-err><![CDATA[Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
+    <system-err><![CDATA[Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
 INFO: Deleted all appointments
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
+Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
 INFO: Saved appointment: TEST010
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
+Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
 INFO: Deleted all appointments
 ]]></system-err>
   </testcase>
   <testcase name="testFlexibleAppointment" classname="com.vikk.appointmentscheduler.database.AppointmentDAOTest" time="0.016">
-    <system-err><![CDATA[Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
+    <system-err><![CDATA[Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
 INFO: Deleted all appointments
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
+Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
 INFO: Saved appointment: TEST011
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
+Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
 INFO: Deleted all appointments
 ]]></system-err>
   </testcase>
   <testcase name="testDeleteAll" classname="com.vikk.appointmentscheduler.database.AppointmentDAOTest" time="0.025">
-    <system-err><![CDATA[Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
+    <system-err><![CDATA[Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
 INFO: Deleted all appointments
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
+Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
 INFO: Saved appointment: TEST008
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
+Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
 INFO: Saved appointment: TEST009
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
+Oct 04, 2025 5:43:48 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
 INFO: Deleted all appointments
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
+Oct 04, 2025 5:43:49 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
 INFO: Deleted all appointments
 ]]></system-err>
   </testcase>
-  <testcase name="testDeleteAppointment" classname="com.vikk.appointmentscheduler.database.AppointmentDAOTest" time="0.018">
-    <system-err><![CDATA[Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
+  <testcase name="testDeleteAppointment" classname="com.vikk.appointmentscheduler.database.AppointmentDAOTest" time="0.021">
+    <system-err><![CDATA[Oct 04, 2025 5:43:49 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
 INFO: Deleted all appointments
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
+Oct 04, 2025 5:43:49 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
 INFO: Saved appointment: TEST007
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO delete
+Oct 04, 2025 5:43:49 PM com.vikk.appointmentscheduler.database.AppointmentDAO delete
 INFO: Deleted appointment: TEST007
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
+Oct 04, 2025 5:43:49 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
 INFO: Deleted all appointments
 ]]></system-err>
   </testcase>
-  <testcase name="testAppointmentWithConflicts" classname="com.vikk.appointmentscheduler.database.AppointmentDAOTest" time="0.016">
-    <system-err><![CDATA[Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
+  <testcase name="testAppointmentWithConflicts" classname="com.vikk.appointmentscheduler.database.AppointmentDAOTest" time="0.018">
+    <system-err><![CDATA[Oct 04, 2025 5:43:49 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
 INFO: Deleted all appointments
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
+Oct 04, 2025 5:43:49 PM com.vikk.appointmentscheduler.database.AppointmentDAO save
 INFO: Saved appointment: TEST012
-Oct 04, 2025 5:32:55 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
+Oct 04, 2025 5:43:49 PM com.vikk.appointmentscheduler.database.AppointmentDAO deleteAll
 INFO: Deleted all appointments
 ]]></system-err>
   </testcase>

@@ -242,20 +242,24 @@ public class Resource {
 
     @Override
     public boolean equals(Object o) {
-<span class="nc bnc" id="L245" title="All 2 branches missed.">        if (this == o) return true;</span>
-<span class="nc bnc" id="L246" title="All 4 branches missed.">        if (o == null || getClass() != o.getClass()) return false;</span>
-<span class="nc" id="L247">        Resource resource = (Resource) o;</span>
-<span class="nc" id="L248">        return Objects.equals(id, resource.id);</span>
+<span class="nc bnc" id="L245" title="All 2 branches missed.">        if (this == o) {</span>
+<span class="nc" id="L246">            return true;</span>
+        }
+<span class="nc bnc" id="L248" title="All 4 branches missed.">        if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L249">            return false;</span>
+        }
+<span class="nc" id="L251">        Resource resource = (Resource) o;</span>
+<span class="nc" id="L252">        return Objects.equals(id, resource.id);</span>
     }
 
     @Override
     public int hashCode() {
-<span class="nc" id="L253">        return Objects.hash(id);</span>
+<span class="nc" id="L257">        return Objects.hash(id);</span>
     }
 
     @Override
     public String toString() {
-<span class="nc" id="L258">        return &quot;Resource{&quot; +</span>
+<span class="nc" id="L262">        return &quot;Resource{&quot; +</span>
                 &quot;id='&quot; + id + '\'' +
                 &quot;, name='&quot; + name + '\'' +
                 &quot;, type=&quot; + type +
