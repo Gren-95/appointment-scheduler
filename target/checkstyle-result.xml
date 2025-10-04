@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <checkstyle version="9.3">
+<file name="/mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/src/main/java/com/vikk/appointmentscheduler/model/Priority.java">
+</file>
+<file name="/mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/src/main/java/com/vikk/appointmentscheduler/model/AppointmentStatus.java">
+</file>
 <file name="/mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/src/main/java/com/vikk/appointmentscheduler/model/Schedule.java">
 <error line="28" column="5" severity="warning" message="Missing a Javadoc comment." source="com.puppycrawl.tools.checkstyle.checks.javadoc.MissingJavadocMethodCheck"/>
 <error line="36" column="5" severity="warning" message="Missing a Javadoc comment." source="com.puppycrawl.tools.checkstyle.checks.javadoc.MissingJavadocMethodCheck"/>
@@ -9,6 +13,10 @@
 <error line="38" column="5" severity="warning" message="Missing a Javadoc comment." source="com.puppycrawl.tools.checkstyle.checks.javadoc.MissingJavadocMethodCheck"/>
 <error line="45" column="5" severity="warning" message="Missing a Javadoc comment." source="com.puppycrawl.tools.checkstyle.checks.javadoc.MissingJavadocMethodCheck"/>
 <error line="182" column="5" severity="warning" message="Missing a Javadoc comment." source="com.puppycrawl.tools.checkstyle.checks.javadoc.MissingJavadocMethodCheck"/>
+</file>
+<file name="/mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/src/main/java/com/vikk/appointmentscheduler/model/AppointmentType.java">
+</file>
+<file name="/mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/src/main/java/com/vikk/appointmentscheduler/model/ResourceType.java">
 </file>
 <file name="/mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/src/main/java/com/vikk/appointmentscheduler/model/Appointment.java">
 <error line="92" column="5" severity="warning" message="Missing a Javadoc comment." source="com.puppycrawl.tools.checkstyle.checks.javadoc.MissingJavadocMethodCheck"/>
@@ -25,6 +33,8 @@
 <error line="40" column="5" severity="warning" message="Missing a Javadoc comment." source="com.puppycrawl.tools.checkstyle.checks.javadoc.MissingJavadocMethodCheck"/>
 <error line="44" column="5" severity="warning" message="Missing a Javadoc comment." source="com.puppycrawl.tools.checkstyle.checks.javadoc.MissingJavadocMethodCheck"/>
 <error line="284" column="9" severity="warning" message="&apos;if&apos; construct must use &apos;{}&apos;s." source="com.puppycrawl.tools.checkstyle.checks.blocks.NeedBracesCheck"/>
+</file>
+<file name="/mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/src/main/java/com/vikk/appointmentscheduler/algorithm/SchedulingAlgorithm.java">
 </file>
 <file name="/mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/src/main/java/com/vikk/appointmentscheduler/algorithm/SimulatedAnnealingAlgorithm.java">
 <error line="38" column="5" severity="warning" message="Missing a Javadoc comment." source="com.puppycrawl.tools.checkstyle.checks.javadoc.MissingJavadocMethodCheck"/>
@@ -109,12 +119,12 @@
 <error line="337" column="5" severity="warning" message="Missing a Javadoc comment." source="com.puppycrawl.tools.checkstyle.checks.javadoc.MissingJavadocMethodCheck"/>
 </file>
 <file name="/mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/src/main/java/com/vikk/appointmentscheduler/exception/NoValidSolutionException.java">
-<error line="8" column="5" severity="warning" message="Missing a Javadoc comment." source="com.puppycrawl.tools.checkstyle.checks.javadoc.MissingJavadocMethodCheck"/>
-<error line="12" column="5" severity="warning" message="Missing a Javadoc comment." source="com.puppycrawl.tools.checkstyle.checks.javadoc.MissingJavadocMethodCheck"/>
+<error line="9" column="5" severity="warning" message="Missing a Javadoc comment." source="com.puppycrawl.tools.checkstyle.checks.javadoc.MissingJavadocMethodCheck"/>
+<error line="13" column="5" severity="warning" message="Missing a Javadoc comment." source="com.puppycrawl.tools.checkstyle.checks.javadoc.MissingJavadocMethodCheck"/>
 </file>
 <file name="/mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/src/main/java/com/vikk/appointmentscheduler/exception/SchedulingException.java">
-<error line="8" column="5" severity="warning" message="Missing a Javadoc comment." source="com.puppycrawl.tools.checkstyle.checks.javadoc.MissingJavadocMethodCheck"/>
-<error line="12" column="5" severity="warning" message="Missing a Javadoc comment." source="com.puppycrawl.tools.checkstyle.checks.javadoc.MissingJavadocMethodCheck"/>
+<error line="9" column="5" severity="warning" message="Missing a Javadoc comment." source="com.puppycrawl.tools.checkstyle.checks.javadoc.MissingJavadocMethodCheck"/>
+<error line="13" column="5" severity="warning" message="Missing a Javadoc comment." source="com.puppycrawl.tools.checkstyle.checks.javadoc.MissingJavadocMethodCheck"/>
 </file>
 <file name="/mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/src/main/java/com/vikk/appointmentscheduler/service/AppointmentSchedulingService.java">
 <error line="30" column="5" severity="warning" message="Missing a Javadoc comment." source="com.puppycrawl.tools.checkstyle.checks.javadoc.MissingJavadocMethodCheck"/>

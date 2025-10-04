@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.vikk.appointmentscheduler.database.AppointmentDAOTest
--------------------------------------------------------------------------------
-Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.230 s -- in com.vikk.appointmentscheduler.database.AppointmentDAOTest
