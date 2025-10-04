@@ -1,0 +1,853 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SchedulingGUI.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Appointment Scheduling Optimizer</a> &gt; <a href="index.source.html" class="el_package">com.vikk.appointmentscheduler.gui</a> &gt; <span class="el_source">SchedulingGUI.java</span></div><h1>SchedulingGUI.java</h1><pre class="source lang-java linenums">package com.vikk.appointmentscheduler.gui;
+
+import com.vikk.appointmentscheduler.algorithm.ConstraintSatisfactionAlgorithm;
+import com.vikk.appointmentscheduler.algorithm.GeneticAlgorithm;
+import com.vikk.appointmentscheduler.algorithm.SimulatedAnnealingAlgorithm;
+import com.vikk.appointmentscheduler.algorithm.SchedulingAlgorithm;
+import com.vikk.appointmentscheduler.database.AppointmentDAO;
+import com.vikk.appointmentscheduler.database.DatabaseManager;
+import com.vikk.appointmentscheduler.database.ResourceDAO;
+import com.vikk.appointmentscheduler.model.*;
+import com.vikk.appointmentscheduler.service.AppointmentSchedulingService;
+import com.vikk.appointmentscheduler.util.MathUtils;
+
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.stage.Stage;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+
+/**
+ * JavaFX GUI for the Appointment Scheduling Optimizer.
+ * Provides a user-friendly interface for managing appointments, resources,
+ * and running optimization algorithms.
+ */
+<span class="nc" id="L41">public class SchedulingGUI extends Application {</span>
+
+<span class="nc" id="L43">    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd HH:mm&quot;);</span>
+    
+    // Data
+<span class="nc" id="L46">    private ObservableList&lt;Appointment&gt; appointments = FXCollections.observableArrayList();</span>
+<span class="nc" id="L47">    private ObservableList&lt;Resource&gt; resources = FXCollections.observableArrayList();</span>
+    private AppointmentSchedulingService schedulingService;
+<span class="nc" id="L49">    private Map&lt;String, Schedule&gt; optimizationResults = new HashMap&lt;&gt;();</span>
+    
+    // Database
+    private AppointmentDAO appointmentDAO;
+    private ResourceDAO resourceDAO;
+    
+    // UI Components
+    private TableView&lt;Appointment&gt; appointmentTable;
+    private TableView&lt;Resource&gt; resourceTable;
+    private TableView&lt;ScheduleResult&gt; resultTable;
+    private TextArea logArea;
+    private ProgressBar progressBar;
+    private Label statusLabel;
+    private TextArea scheduleArea;
+    
+    // Algorithm selection
+    private CheckBox cspCheckBox;
+    private CheckBox gaCheckBox;
+    private CheckBox saCheckBox;
+
+    @Override
+    public void start(Stage primaryStage) {
+<span class="nc" id="L71">        primaryStage.setTitle(&quot;Appointment Scheduling Optimizer&quot;);</span>
+<span class="nc" id="L72">        primaryStage.setMinWidth(1200);</span>
+<span class="nc" id="L73">        primaryStage.setMinHeight(800);</span>
+
+        // Create main layout
+<span class="nc" id="L76">        BorderPane root = new BorderPane();</span>
+<span class="nc" id="L77">        root.setPadding(new Insets(10));</span>
+
+        // Top: Title and controls
+<span class="nc" id="L80">        VBox topPanel = createTopPanel();</span>
+<span class="nc" id="L81">        root.setTop(topPanel);</span>
+
+        // Center: Main content with tabs
+<span class="nc" id="L84">        TabPane tabPane = createTabPane();</span>
+<span class="nc" id="L85">        root.setCenter(tabPane);</span>
+
+        // Bottom: Status and progress
+<span class="nc" id="L88">        HBox bottomPanel = createBottomPanel();</span>
+<span class="nc" id="L89">        root.setBottom(bottomPanel);</span>
+
+        // Initialize database after UI is created
+<span class="nc" id="L92">        initializeDatabase();</span>
+        
+        // Load data from database
+<span class="nc" id="L95">        loadDataFromDatabase();</span>
+        
+<span class="nc" id="L97">        schedulingService = new AppointmentSchedulingService(</span>
+<span class="nc" id="L98">            appointments.stream().collect(Collectors.toList()),</span>
+<span class="nc" id="L99">            resources.stream().collect(Collectors.toList())</span>
+        );
+
+<span class="nc" id="L102">        Scene scene = new Scene(root, 1200, 800);</span>
+<span class="nc" id="L103">        primaryStage.setScene(scene);</span>
+<span class="nc" id="L104">        primaryStage.show();</span>
+<span class="nc" id="L105">    }</span>
+
+    private VBox createTopPanel() {
+<span class="nc" id="L108">        VBox topPanel = new VBox(10);</span>
+<span class="nc" id="L109">        topPanel.setPadding(new Insets(10));</span>
+
+        // Title
+<span class="nc" id="L112">        Label titleLabel = new Label(&quot;Appointment Scheduling Optimizer&quot;);</span>
+<span class="nc" id="L113">        titleLabel.setFont(Font.font(&quot;Arial&quot;, FontWeight.BOLD, 24));</span>
+<span class="nc" id="L114">        titleLabel.setTextFill(Color.DARKBLUE);</span>
+
+        // Algorithm selection
+<span class="nc" id="L117">        HBox algorithmPanel = new HBox(20);</span>
+<span class="nc" id="L118">        algorithmPanel.setAlignment(Pos.CENTER_LEFT);</span>
+        
+<span class="nc" id="L120">        Label algorithmLabel = new Label(&quot;Select Algorithms:&quot;);</span>
+<span class="nc" id="L121">        algorithmLabel.setFont(Font.font(&quot;Arial&quot;, FontWeight.BOLD, 14));</span>
+        
+<span class="nc" id="L123">        cspCheckBox = new CheckBox(&quot;Constraint Satisfaction (CSP)&quot;);</span>
+<span class="nc" id="L124">        gaCheckBox = new CheckBox(&quot;Genetic Algorithm (GA)&quot;);</span>
+<span class="nc" id="L125">        saCheckBox = new CheckBox(&quot;Simulated Annealing (SA)&quot;);</span>
+        
+        // Select all by default
+<span class="nc" id="L128">        cspCheckBox.setSelected(true);</span>
+<span class="nc" id="L129">        gaCheckBox.setSelected(true);</span>
+<span class="nc" id="L130">        saCheckBox.setSelected(true);</span>
+        
+<span class="nc" id="L132">        algorithmPanel.getChildren().addAll(algorithmLabel, cspCheckBox, gaCheckBox, saCheckBox);</span>
+
+        // Control buttons
+<span class="nc" id="L135">        HBox buttonPanel = new HBox(10);</span>
+<span class="nc" id="L136">        buttonPanel.setAlignment(Pos.CENTER_LEFT);</span>
+        
+<span class="nc" id="L138">        Button runOptimizationButton = new Button(&quot;Run Optimization&quot;);</span>
+<span class="nc" id="L139">        runOptimizationButton.setStyle(&quot;-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;&quot;);</span>
+<span class="nc" id="L140">        runOptimizationButton.setOnAction(e -&gt; runOptimization());</span>
+        
+<span class="nc" id="L142">        Button addAppointmentButton = new Button(&quot;Add Appointment&quot;);</span>
+<span class="nc" id="L143">        addAppointmentButton.setStyle(&quot;-fx-background-color: #2196F3; -fx-text-fill: white;&quot;);</span>
+<span class="nc" id="L144">        addAppointmentButton.setOnAction(e -&gt; showAddAppointmentDialog());</span>
+        
+<span class="nc" id="L146">        Button addResourceButton = new Button(&quot;Add Resource&quot;);</span>
+<span class="nc" id="L147">        addResourceButton.setStyle(&quot;-fx-background-color: #FF9800; -fx-text-fill: white;&quot;);</span>
+<span class="nc" id="L148">        addResourceButton.setOnAction(e -&gt; showAddResourceDialog());</span>
+        
+<span class="nc" id="L150">        Button clearDataButton = new Button(&quot;Clear All Data&quot;);</span>
+<span class="nc" id="L151">        clearDataButton.setStyle(&quot;-fx-background-color: #F44336; -fx-text-fill: white;&quot;);</span>
+<span class="nc" id="L152">        clearDataButton.setOnAction(e -&gt; clearAllData());</span>
+        
+<span class="nc" id="L154">        buttonPanel.getChildren().addAll(runOptimizationButton, addAppointmentButton, addResourceButton, clearDataButton);</span>
+
+<span class="nc" id="L156">        topPanel.getChildren().addAll(titleLabel, algorithmPanel, buttonPanel);</span>
+<span class="nc" id="L157">        return topPanel;</span>
+    }
+
+    private TabPane createTabPane() {
+<span class="nc" id="L161">        TabPane tabPane = new TabPane();</span>
+
+        // Appointments tab
+<span class="nc" id="L164">        Tab appointmentsTab = new Tab(&quot;Appointments&quot;);</span>
+<span class="nc" id="L165">        appointmentsTab.setContent(createAppointmentsTab());</span>
+<span class="nc" id="L166">        appointmentsTab.setClosable(false);</span>
+
+        // Resources tab
+<span class="nc" id="L169">        Tab resourcesTab = new Tab(&quot;Resources&quot;);</span>
+<span class="nc" id="L170">        resourcesTab.setContent(createResourcesTab());</span>
+<span class="nc" id="L171">        resourcesTab.setClosable(false);</span>
+
+        // Results tab
+<span class="nc" id="L174">        Tab resultsTab = new Tab(&quot;Optimization Results&quot;);</span>
+<span class="nc" id="L175">        resultsTab.setContent(createResultsTab());</span>
+<span class="nc" id="L176">        resultsTab.setClosable(false);</span>
+
+        // Schedule tab
+<span class="nc" id="L179">        Tab scheduleTab = new Tab(&quot;Best Schedule&quot;);</span>
+<span class="nc" id="L180">        scheduleTab.setContent(createScheduleTab());</span>
+<span class="nc" id="L181">        scheduleTab.setClosable(false);</span>
+
+<span class="nc" id="L183">        tabPane.getTabs().addAll(appointmentsTab, resourcesTab, resultsTab, scheduleTab);</span>
+<span class="nc" id="L184">        return tabPane;</span>
+    }
+
+    private VBox createAppointmentsTab() {
+<span class="nc" id="L188">        VBox vbox = new VBox(10);</span>
+<span class="nc" id="L189">        vbox.setPadding(new Insets(10));</span>
+
+        // Table
+<span class="nc" id="L192">        appointmentTable = new TableView&lt;&gt;();</span>
+<span class="nc" id="L193">        appointmentTable.setItems(appointments);</span>
+
+        // Columns
+<span class="nc" id="L196">        TableColumn&lt;Appointment, String&gt; idCol = new TableColumn&lt;&gt;(&quot;ID&quot;);</span>
+<span class="nc" id="L197">        idCol.setCellValueFactory(new PropertyValueFactory&lt;&gt;(&quot;id&quot;));</span>
+
+<span class="nc" id="L199">        TableColumn&lt;Appointment, String&gt; descriptionCol = new TableColumn&lt;&gt;(&quot;Description&quot;);</span>
+<span class="nc" id="L200">        descriptionCol.setCellValueFactory(new PropertyValueFactory&lt;&gt;(&quot;description&quot;));</span>
+
+<span class="nc" id="L202">        TableColumn&lt;Appointment, AppointmentType&gt; typeCol = new TableColumn&lt;&gt;(&quot;Type&quot;);</span>
+<span class="nc" id="L203">        typeCol.setCellValueFactory(new PropertyValueFactory&lt;&gt;(&quot;type&quot;));</span>
+
+<span class="nc" id="L205">        TableColumn&lt;Appointment, com.vikk.appointmentscheduler.model.Priority&gt; priorityCol = new TableColumn&lt;&gt;(&quot;Priority&quot;);</span>
+<span class="nc" id="L206">        priorityCol.setCellValueFactory(new PropertyValueFactory&lt;&gt;(&quot;priority&quot;));</span>
+
+<span class="nc" id="L208">        TableColumn&lt;Appointment, String&gt; startTimeCol = new TableColumn&lt;&gt;(&quot;Requested Start&quot;);</span>
+<span class="nc" id="L209">        startTimeCol.setCellValueFactory(cellData -&gt; {</span>
+<span class="nc" id="L210">            LocalDateTime startTime = cellData.getValue().getStartTime();</span>
+<span class="nc" id="L211">            return new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc bnc" id="L212" title="All 2 branches missed.">                startTime != null ? startTime.format(TIME_FORMATTER) : &quot;N/A&quot;</span>
+            );
+        });
+
+<span class="nc" id="L216">        TableColumn&lt;Appointment, Long&gt; durationCol = new TableColumn&lt;&gt;(&quot;Duration (min)&quot;);</span>
+<span class="nc" id="L217">        durationCol.setCellValueFactory(new PropertyValueFactory&lt;&gt;(&quot;durationMinutes&quot;));</span>
+
+<span class="nc" id="L219">        TableColumn&lt;Appointment, com.vikk.appointmentscheduler.model.AppointmentStatus&gt; statusCol = new TableColumn&lt;&gt;(&quot;Status&quot;);</span>
+<span class="nc" id="L220">        statusCol.setCellValueFactory(new PropertyValueFactory&lt;&gt;(&quot;status&quot;));</span>
+
+<span class="nc" id="L222">        appointmentTable.getColumns().addAll(idCol, descriptionCol, typeCol, priorityCol, startTimeCol, durationCol, statusCol);</span>
+
+        // Context menu
+<span class="nc" id="L225">        ContextMenu contextMenu = new ContextMenu();</span>
+<span class="nc" id="L226">        MenuItem editItem = new MenuItem(&quot;Edit&quot;);</span>
+<span class="nc" id="L227">        editItem.setOnAction(e -&gt; editSelectedAppointment());</span>
+<span class="nc" id="L228">        MenuItem deleteItem = new MenuItem(&quot;Delete&quot;);</span>
+<span class="nc" id="L229">        deleteItem.setOnAction(e -&gt; deleteSelectedAppointment());</span>
+<span class="nc" id="L230">        contextMenu.getItems().addAll(editItem, deleteItem);</span>
+<span class="nc" id="L231">        appointmentTable.setContextMenu(contextMenu);</span>
+
+<span class="nc" id="L233">        vbox.getChildren().add(appointmentTable);</span>
+<span class="nc" id="L234">        return vbox;</span>
+    }
+
+    private VBox createResourcesTab() {
+<span class="nc" id="L238">        VBox vbox = new VBox(10);</span>
+<span class="nc" id="L239">        vbox.setPadding(new Insets(10));</span>
+
+        // Table
+<span class="nc" id="L242">        resourceTable = new TableView&lt;&gt;();</span>
+<span class="nc" id="L243">        resourceTable.setItems(resources);</span>
+
+        // Columns
+<span class="nc" id="L246">        TableColumn&lt;Resource, String&gt; idCol = new TableColumn&lt;&gt;(&quot;ID&quot;);</span>
+<span class="nc" id="L247">        idCol.setCellValueFactory(new PropertyValueFactory&lt;&gt;(&quot;id&quot;));</span>
+
+<span class="nc" id="L249">        TableColumn&lt;Resource, String&gt; nameCol = new TableColumn&lt;&gt;(&quot;Name&quot;);</span>
+<span class="nc" id="L250">        nameCol.setCellValueFactory(new PropertyValueFactory&lt;&gt;(&quot;name&quot;));</span>
+
+<span class="nc" id="L252">        TableColumn&lt;Resource, ResourceType&gt; typeCol = new TableColumn&lt;&gt;(&quot;Type&quot;);</span>
+<span class="nc" id="L253">        typeCol.setCellValueFactory(new PropertyValueFactory&lt;&gt;(&quot;type&quot;));</span>
+
+<span class="nc" id="L255">        TableColumn&lt;Resource, String&gt; capabilitiesCol = new TableColumn&lt;&gt;(&quot;Capabilities&quot;);</span>
+<span class="nc" id="L256">        capabilitiesCol.setCellValueFactory(cellData -&gt; {</span>
+<span class="nc" id="L257">            Set&lt;String&gt; capabilities = cellData.getValue().getCapabilities();</span>
+<span class="nc" id="L258">            return new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc bnc" id="L259" title="All 2 branches missed.">                capabilities != null ? capabilities.toString() : &quot;All&quot;</span>
+            );
+        });
+
+<span class="nc" id="L263">        TableColumn&lt;Resource, Double&gt; costCol = new TableColumn&lt;&gt;(&quot;Cost/Hour&quot;);</span>
+<span class="nc" id="L264">        costCol.setCellValueFactory(cellData -&gt; {</span>
+<span class="nc" id="L265">            double cost = cellData.getValue().getCostPerHour();</span>
+<span class="nc" id="L266">            return new javafx.beans.property.SimpleDoubleProperty(cost).asObject();</span>
+        });
+
+<span class="nc" id="L269">        TableColumn&lt;Resource, String&gt; availabilityCol = new TableColumn&lt;&gt;(&quot;Availability&quot;);</span>
+<span class="nc" id="L270">        availabilityCol.setCellValueFactory(cellData -&gt; {</span>
+<span class="nc" id="L271">            Set&lt;LocalDateTime&gt; slots = cellData.getValue().getAvailableSlots();</span>
+<span class="nc" id="L272">            return new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc bnc" id="L273" title="All 2 branches missed.">                slots != null ? slots.size() + &quot; slots&quot; : &quot;0 slots&quot;</span>
+            );
+        });
+
+<span class="nc" id="L277">        resourceTable.getColumns().addAll(idCol, nameCol, typeCol, capabilitiesCol, costCol, availabilityCol);</span>
+
+        // Context menu
+<span class="nc" id="L280">        ContextMenu contextMenu = new ContextMenu();</span>
+<span class="nc" id="L281">        MenuItem editItem = new MenuItem(&quot;Edit&quot;);</span>
+<span class="nc" id="L282">        editItem.setOnAction(e -&gt; editSelectedResource());</span>
+<span class="nc" id="L283">        MenuItem deleteItem = new MenuItem(&quot;Delete&quot;);</span>
+<span class="nc" id="L284">        deleteItem.setOnAction(e -&gt; deleteSelectedResource());</span>
+<span class="nc" id="L285">        contextMenu.getItems().addAll(editItem, deleteItem);</span>
+<span class="nc" id="L286">        resourceTable.setContextMenu(contextMenu);</span>
+
+<span class="nc" id="L288">        vbox.getChildren().add(resourceTable);</span>
+<span class="nc" id="L289">        return vbox;</span>
+    }
+
+    private VBox createResultsTab() {
+<span class="nc" id="L293">        VBox vbox = new VBox(10);</span>
+<span class="nc" id="L294">        vbox.setPadding(new Insets(10));</span>
+
+        // Results table
+<span class="nc" id="L297">        resultTable = new TableView&lt;&gt;();</span>
+<span class="nc" id="L298">        resultTable.setItems(FXCollections.observableArrayList());</span>
+
+        // Columns
+<span class="nc" id="L301">        TableColumn&lt;ScheduleResult, String&gt; algorithmCol = new TableColumn&lt;&gt;(&quot;Algorithm&quot;);</span>
+<span class="nc" id="L302">        algorithmCol.setCellValueFactory(new PropertyValueFactory&lt;&gt;(&quot;algorithmName&quot;));</span>
+
+<span class="nc" id="L304">        TableColumn&lt;ScheduleResult, Long&gt; timeCol = new TableColumn&lt;&gt;(&quot;Time (ms)&quot;);</span>
+<span class="nc" id="L305">        timeCol.setCellValueFactory(new PropertyValueFactory&lt;&gt;(&quot;executionTime&quot;));</span>
+
+<span class="nc" id="L307">        TableColumn&lt;ScheduleResult, Integer&gt; iterationsCol = new TableColumn&lt;&gt;(&quot;Iterations&quot;);</span>
+<span class="nc" id="L308">        iterationsCol.setCellValueFactory(new PropertyValueFactory&lt;&gt;(&quot;iterations&quot;));</span>
+
+<span class="nc" id="L310">        TableColumn&lt;ScheduleResult, Double&gt; efficiencyCol = new TableColumn&lt;&gt;(&quot;Efficiency (%)&quot;);</span>
+<span class="nc" id="L311">        efficiencyCol.setCellValueFactory(new PropertyValueFactory&lt;&gt;(&quot;efficiencyScore&quot;));</span>
+
+<span class="nc" id="L313">        TableColumn&lt;ScheduleResult, Double&gt; costCol = new TableColumn&lt;&gt;(&quot;Cost ($)&quot;);</span>
+<span class="nc" id="L314">        costCol.setCellValueFactory(new PropertyValueFactory&lt;&gt;(&quot;totalCost&quot;));</span>
+
+<span class="nc" id="L316">        TableColumn&lt;ScheduleResult, Integer&gt; conflictsCol = new TableColumn&lt;&gt;(&quot;Conflicts&quot;);</span>
+<span class="nc" id="L317">        conflictsCol.setCellValueFactory(new PropertyValueFactory&lt;&gt;(&quot;conflictCount&quot;));</span>
+
+<span class="nc" id="L319">        resultTable.getColumns().addAll(algorithmCol, timeCol, iterationsCol, efficiencyCol, costCol, conflictsCol);</span>
+
+<span class="nc" id="L321">        vbox.getChildren().add(resultTable);</span>
+<span class="nc" id="L322">        return vbox;</span>
+    }
+
+    private VBox createScheduleTab() {
+<span class="nc" id="L326">        VBox vbox = new VBox(10);</span>
+<span class="nc" id="L327">        vbox.setPadding(new Insets(10));</span>
+
+        // Schedule display
+<span class="nc" id="L330">        scheduleArea = new TextArea();</span>
+<span class="nc" id="L331">        scheduleArea.setEditable(false);</span>
+<span class="nc" id="L332">        scheduleArea.setFont(Font.font(&quot;Courier New&quot;, 12));</span>
+<span class="nc" id="L333">        scheduleArea.setPrefRowCount(20);</span>
+<span class="nc" id="L334">        scheduleArea.setText(&quot;Run optimization to see the best schedule details.&quot;);</span>
+
+        // Update schedule display when results change
+<span class="nc" id="L337">        resultTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -&gt; {</span>
+<span class="nc bnc" id="L338" title="All 2 branches missed.">            if (newVal != null) {</span>
+<span class="nc" id="L339">                updateScheduleDisplay(scheduleArea, newVal);</span>
+            }
+<span class="nc" id="L341">        });</span>
+
+<span class="nc" id="L343">        vbox.getChildren().add(scheduleArea);</span>
+<span class="nc" id="L344">        return vbox;</span>
+    }
+
+    private HBox createBottomPanel() {
+<span class="nc" id="L348">        HBox bottomPanel = new HBox(10);</span>
+<span class="nc" id="L349">        bottomPanel.setPadding(new Insets(10));</span>
+<span class="nc" id="L350">        bottomPanel.setAlignment(Pos.CENTER_LEFT);</span>
+
+        // Progress bar
+<span class="nc" id="L353">        progressBar = new ProgressBar();</span>
+<span class="nc" id="L354">        progressBar.setVisible(false);</span>
+<span class="nc" id="L355">        progressBar.setPrefWidth(200);</span>
+
+        // Status label
+<span class="nc" id="L358">        statusLabel = new Label(&quot;Ready&quot;);</span>
+<span class="nc" id="L359">        statusLabel.setFont(Font.font(&quot;Arial&quot;, 12));</span>
+
+        // Log area
+<span class="nc" id="L362">        logArea = new TextArea();</span>
+<span class="nc" id="L363">        logArea.setPrefRowCount(3);</span>
+<span class="nc" id="L364">        logArea.setEditable(false);</span>
+<span class="nc" id="L365">        logArea.setFont(Font.font(&quot;Courier New&quot;, 10));</span>
+
+<span class="nc" id="L367">        VBox logBox = new VBox(5);</span>
+<span class="nc" id="L368">        logBox.getChildren().addAll(new Label(&quot;Log:&quot;), logArea);</span>
+
+<span class="nc" id="L370">        bottomPanel.getChildren().addAll(progressBar, statusLabel, logBox);</span>
+<span class="nc" id="L371">        return bottomPanel;</span>
+    }
+
+    private void initializeDatabase() {
+        try {
+<span class="nc" id="L376">            appointmentDAO = new AppointmentDAO();</span>
+<span class="nc" id="L377">            resourceDAO = new ResourceDAO();</span>
+<span class="nc" id="L378">            logArea.appendText(&quot;Database initialized successfully\n&quot;);</span>
+<span class="nc" id="L379">        } catch (Exception e) {</span>
+<span class="nc" id="L380">            logArea.appendText(&quot;Error initializing database: &quot; + e.getMessage() + &quot;\n&quot;);</span>
+<span class="nc" id="L381">            showAlert(&quot;Database Error&quot;, &quot;Failed to initialize database: &quot; + e.getMessage());</span>
+<span class="nc" id="L382">        }</span>
+<span class="nc" id="L383">    }</span>
+
+    private void loadDataFromDatabase() {
+        try {
+            // Load appointments
+<span class="nc" id="L388">            List&lt;Appointment&gt; appointmentList = appointmentDAO.findAll();</span>
+<span class="nc" id="L389">            appointments.clear();</span>
+<span class="nc" id="L390">            appointments.addAll(appointmentList);</span>
+            
+            // Load resources
+<span class="nc" id="L393">            List&lt;Resource&gt; resourceList = resourceDAO.findAll();</span>
+<span class="nc" id="L394">            resources.clear();</span>
+<span class="nc" id="L395">            resources.addAll(resourceList);</span>
+            
+<span class="nc" id="L397">            logArea.appendText(&quot;Loaded &quot; + appointments.size() + &quot; appointments and &quot; + resources.size() + &quot; resources from database\n&quot;);</span>
+            
+            // If no data exists, create some sample data
+<span class="nc bnc" id="L400" title="All 4 branches missed.">            if (appointments.isEmpty() &amp;&amp; resources.isEmpty()) {</span>
+<span class="nc" id="L401">                createSampleData();</span>
+            }
+            
+<span class="nc" id="L404">        } catch (Exception e) {</span>
+<span class="nc" id="L405">            logArea.appendText(&quot;Error loading data from database: &quot; + e.getMessage() + &quot;\n&quot;);</span>
+<span class="nc" id="L406">            showAlert(&quot;Database Error&quot;, &quot;Failed to load data: &quot; + e.getMessage());</span>
+<span class="nc" id="L407">        }</span>
+<span class="nc" id="L408">    }</span>
+
+    private void createSampleData() {
+        try {
+            // Create sample appointments
+<span class="nc" id="L413">            LocalDateTime now = LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.MINUTES);</span>
+            
+<span class="nc" id="L415">            Appointment apt1 = createAppointment(&quot;APT001&quot;, AppointmentType.CONSULTATION, &quot;Initial Consultation&quot;,</span>
+<span class="nc" id="L416">                    now.plusHours(1), Duration.ofMinutes(60), com.vikk.appointmentscheduler.model.Priority.HIGH);</span>
+<span class="nc" id="L417">            Appointment apt2 = createAppointment(&quot;APT002&quot;, AppointmentType.FOLLOW_UP, &quot;Follow-up Visit&quot;,</span>
+<span class="nc" id="L418">                    now.plusHours(2), Duration.ofMinutes(30), com.vikk.appointmentscheduler.model.Priority.MEDIUM);</span>
+<span class="nc" id="L419">            Appointment apt3 = createAppointment(&quot;APT003&quot;, AppointmentType.TREATMENT, &quot;Physical Therapy&quot;,</span>
+<span class="nc" id="L420">                    now.plusHours(1).plusMinutes(30), Duration.ofMinutes(60), com.vikk.appointmentscheduler.model.Priority.MEDIUM);</span>
+<span class="nc" id="L421">            Appointment apt4 = createAppointment(&quot;APT004&quot;, AppointmentType.EMERGENCY, &quot;Emergency Consultation&quot;,</span>
+<span class="nc" id="L422">                    now.plusMinutes(10), Duration.ofMinutes(30), com.vikk.appointmentscheduler.model.Priority.URGENT);</span>
+<span class="nc" id="L423">            Appointment apt5 = createAppointment(&quot;APT005&quot;, AppointmentType.SURGERY, &quot;Minor Surgery&quot;,</span>
+<span class="nc" id="L424">                    now.plusHours(3), Duration.ofMinutes(60), com.vikk.appointmentscheduler.model.Priority.HIGH);</span>
+<span class="nc" id="L425">            Appointment apt6 = createAppointment(&quot;APT006&quot;, AppointmentType.CONSULTATION, &quot;Routine Checkup&quot;,</span>
+<span class="nc" id="L426">                    now.plusHours(2).plusMinutes(45), Duration.ofMinutes(30), com.vikk.appointmentscheduler.model.Priority.LOW);</span>
+
+            // Save appointments to database
+<span class="nc" id="L429">            appointmentDAO.save(apt1);</span>
+<span class="nc" id="L430">            appointmentDAO.save(apt2);</span>
+<span class="nc" id="L431">            appointmentDAO.save(apt3);</span>
+<span class="nc" id="L432">            appointmentDAO.save(apt4);</span>
+<span class="nc" id="L433">            appointmentDAO.save(apt5);</span>
+<span class="nc" id="L434">            appointmentDAO.save(apt6);</span>
+
+            // Create sample resources
+<span class="nc" id="L437">            Resource room1 = createResource(&quot;ROOM001&quot;, &quot;Examination Room 1&quot;, ResourceType.ROOM, </span>
+<span class="nc" id="L438">                    Set.of(&quot;CONSULTATION&quot;, &quot;FOLLOW_UP&quot;), 50.0, now, now.plusDays(1));</span>
+<span class="nc" id="L439">            Resource room2 = createResource(&quot;ROOM002&quot;, &quot;Treatment Room&quot;, ResourceType.ROOM, </span>
+<span class="nc" id="L440">                    Set.of(&quot;TREATMENT&quot;, &quot;THERAPY&quot;), 75.0, now, now.plusDays(1));</span>
+<span class="nc" id="L441">            Resource room3 = createResource(&quot;ROOM003&quot;, &quot;Emergency Room&quot;, ResourceType.ROOM, </span>
+<span class="nc" id="L442">                    Set.of(&quot;EMERGENCY&quot;), 100.0, now, now.plusDays(1));</span>
+<span class="nc" id="L443">            Resource room4 = createResource(&quot;ROOM004&quot;, &quot;Operating Room&quot;, ResourceType.ROOM, </span>
+<span class="nc" id="L444">                    Set.of(&quot;SURGERY&quot;), 200.0, now, now.plusDays(1));</span>
+<span class="nc" id="L445">            Resource staff1 = createResource(&quot;STAFF001&quot;, &quot;Dr. Smith&quot;, ResourceType.STAFF, </span>
+<span class="nc" id="L446">                    Set.of(&quot;CONSULTATION&quot;, &quot;FOLLOW_UP&quot;), 150.0, now, now.plusDays(1));</span>
+<span class="nc" id="L447">            Resource staff2 = createResource(&quot;STAFF002&quot;, &quot;Physical Therapist&quot;, ResourceType.STAFF, </span>
+<span class="nc" id="L448">                    Set.of(&quot;TREATMENT&quot;, &quot;THERAPY&quot;), 80.0, now, now.plusDays(1));</span>
+<span class="nc" id="L449">            Resource staff3 = createResource(&quot;STAFF003&quot;, &quot;Dr. Johnson (Surgeon)&quot;, ResourceType.STAFF, </span>
+<span class="nc" id="L450">                    Set.of(&quot;SURGERY&quot;), 300.0, now, now.plusDays(1));</span>
+
+            // Save resources to database
+<span class="nc" id="L453">            resourceDAO.save(room1);</span>
+<span class="nc" id="L454">            resourceDAO.save(room2);</span>
+<span class="nc" id="L455">            resourceDAO.save(room3);</span>
+<span class="nc" id="L456">            resourceDAO.save(room4);</span>
+<span class="nc" id="L457">            resourceDAO.save(staff1);</span>
+<span class="nc" id="L458">            resourceDAO.save(staff2);</span>
+<span class="nc" id="L459">            resourceDAO.save(staff3);</span>
+
+            // Reload data from database
+<span class="nc" id="L462">            loadDataFromDatabase();</span>
+            
+<span class="nc" id="L464">            logArea.appendText(&quot;Created sample data\n&quot;);</span>
+            
+<span class="nc" id="L466">        } catch (Exception e) {</span>
+<span class="nc" id="L467">            logArea.appendText(&quot;Error creating sample data: &quot; + e.getMessage() + &quot;\n&quot;);</span>
+<span class="nc" id="L468">        }</span>
+<span class="nc" id="L469">    }</span>
+
+    private Resource createResource(String id, String name, ResourceType type, Set&lt;String&gt; capabilities, 
+                                  double costPerHour, LocalDateTime availableFrom, LocalDateTime availableTo) {
+<span class="nc" id="L473">        Resource resource = new Resource();</span>
+<span class="nc" id="L474">        resource.setId(id);</span>
+<span class="nc" id="L475">        resource.setName(name);</span>
+<span class="nc" id="L476">        resource.setType(type);</span>
+<span class="nc" id="L477">        resource.setCapabilities(capabilities);</span>
+<span class="nc" id="L478">        resource.setCostPerHour(costPerHour);</span>
+<span class="nc" id="L479">        resource.setAvailableFrom(availableFrom);</span>
+<span class="nc" id="L480">        resource.setAvailableTo(availableTo);</span>
+<span class="nc" id="L481">        resource.setActive(true);</span>
+<span class="nc" id="L482">        return resource;</span>
+    }
+
+    private void runOptimization() {
+<span class="nc bnc" id="L486" title="All 4 branches missed.">        if (appointments.isEmpty() || resources.isEmpty()) {</span>
+<span class="nc" id="L487">            showAlert(&quot;Error&quot;, &quot;Please add at least one appointment and one resource before running optimization.&quot;);</span>
+<span class="nc" id="L488">            return;</span>
+        }
+
+        // Update service with current data
+<span class="nc" id="L492">        schedulingService = new AppointmentSchedulingService(</span>
+<span class="nc" id="L493">            appointments.stream().collect(Collectors.toList()),</span>
+<span class="nc" id="L494">            resources.stream().collect(Collectors.toList())</span>
+        );
+
+        // The service already has all algorithms registered
+        // We'll filter results based on selection
+
+<span class="nc bnc" id="L500" title="All 2 branches missed.">        if (schedulingService.getRegisteredAlgorithms().isEmpty()) {</span>
+<span class="nc" id="L501">            showAlert(&quot;Error&quot;, &quot;Please select at least one algorithm.&quot;);</span>
+<span class="nc" id="L502">            return;</span>
+        }
+
+        // Run optimization asynchronously
+<span class="nc" id="L506">        progressBar.setVisible(true);</span>
+<span class="nc" id="L507">        progressBar.setProgress(-1); // Indeterminate progress</span>
+<span class="nc" id="L508">        statusLabel.setText(&quot;Running optimization...&quot;);</span>
+<span class="nc" id="L509">        logArea.appendText(&quot;Starting optimization with &quot; + schedulingService.getRegisteredAlgorithms().size() + &quot; algorithms...\n&quot;);</span>
+
+<span class="nc" id="L511">        CompletableFuture.runAsync(() -&gt; {</span>
+            try {
+<span class="nc" id="L513">                Map&lt;String, Schedule&gt; results = new HashMap&lt;&gt;();</span>
+                
+                // Run selected algorithms
+<span class="nc bnc" id="L516" title="All 2 branches missed.">                if (cspCheckBox.isSelected()) {</span>
+<span class="nc" id="L517">                    Schedule cspResult = schedulingService.optimizeSchedule(&quot;CSP&quot;);</span>
+<span class="nc" id="L518">                    results.put(&quot;CSP&quot;, cspResult);</span>
+                }
+<span class="nc bnc" id="L520" title="All 2 branches missed.">                if (gaCheckBox.isSelected()) {</span>
+<span class="nc" id="L521">                    Schedule gaResult = schedulingService.optimizeSchedule(&quot;GA&quot;);</span>
+<span class="nc" id="L522">                    results.put(&quot;GA&quot;, gaResult);</span>
+                }
+<span class="nc bnc" id="L524" title="All 2 branches missed.">                if (saCheckBox.isSelected()) {</span>
+<span class="nc" id="L525">                    Schedule saResult = schedulingService.optimizeSchedule(&quot;SA&quot;);</span>
+<span class="nc" id="L526">                    results.put(&quot;SA&quot;, saResult);</span>
+                }
+                
+                // Store results for display
+<span class="nc" id="L530">                optimizationResults.clear();</span>
+<span class="nc" id="L531">                optimizationResults.putAll(results);</span>
+                
+<span class="nc" id="L533">                final Map&lt;String, AppointmentSchedulingService.AlgorithmComparisonResult&gt; comparisonResults = schedulingService.compareAlgorithms();</span>
+
+<span class="nc" id="L535">                Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L536">                    updateResultsTable(comparisonResults);</span>
+<span class="nc" id="L537">                    updateBestScheduleDisplay();</span>
+<span class="nc" id="L538">                    progressBar.setVisible(false);</span>
+<span class="nc" id="L539">                    statusLabel.setText(&quot;Optimization completed&quot;);</span>
+<span class="nc" id="L540">                    logArea.appendText(&quot;Optimization completed successfully!\n&quot;);</span>
+<span class="nc" id="L541">                });</span>
+<span class="nc" id="L542">            } catch (Exception e) {</span>
+<span class="nc" id="L543">                Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L544">                    progressBar.setVisible(false);</span>
+<span class="nc" id="L545">                    statusLabel.setText(&quot;Optimization failed&quot;);</span>
+<span class="nc" id="L546">                    logArea.appendText(&quot;Error: &quot; + e.getMessage() + &quot;\n&quot;);</span>
+<span class="nc" id="L547">                    showAlert(&quot;Error&quot;, &quot;Optimization failed: &quot; + e.getMessage());</span>
+<span class="nc" id="L548">                });</span>
+<span class="nc" id="L549">            }</span>
+<span class="nc" id="L550">        });</span>
+<span class="nc" id="L551">    }</span>
+
+    private void updateResultsTable(Map&lt;String, AppointmentSchedulingService.AlgorithmComparisonResult&gt; results) {
+<span class="nc" id="L554">        ObservableList&lt;ScheduleResult&gt; resultData = FXCollections.observableArrayList();</span>
+        
+<span class="nc bnc" id="L556" title="All 2 branches missed.">        for (AppointmentSchedulingService.AlgorithmComparisonResult result : results.values()) {</span>
+<span class="nc" id="L557">            resultData.add(new ScheduleResult(</span>
+<span class="nc" id="L558">                result.getAlgorithmName(),</span>
+<span class="nc" id="L559">                result.getExecutionTime(),</span>
+<span class="nc" id="L560">                result.getIterations(),</span>
+<span class="nc" id="L561">                result.getEfficiencyScore(),</span>
+<span class="nc" id="L562">                result.getTotalCost(),</span>
+<span class="nc" id="L563">                result.getConflictCount()</span>
+            ));
+<span class="nc" id="L565">        }</span>
+        
+<span class="nc" id="L567">        resultTable.setItems(resultData);</span>
+<span class="nc" id="L568">    }</span>
+
+    private void updateBestScheduleDisplay() {
+<span class="nc bnc" id="L571" title="All 2 branches missed.">        if (optimizationResults.isEmpty()) {</span>
+<span class="nc" id="L572">            scheduleArea.setText(&quot;No optimization results available. Run optimization first.&quot;);</span>
+<span class="nc" id="L573">            return;</span>
+        }
+        
+        // Find the best schedule (lowest cost, highest efficiency)
+<span class="nc" id="L577">        Schedule bestSchedule = null;</span>
+<span class="nc" id="L578">        String bestAlgorithm = &quot;&quot;;</span>
+<span class="nc" id="L579">        double bestScore = Double.MAX_VALUE;</span>
+        
+<span class="nc bnc" id="L581" title="All 2 branches missed.">        for (Map.Entry&lt;String, Schedule&gt; entry : optimizationResults.entrySet()) {</span>
+<span class="nc" id="L582">            String algorithm = entry.getKey();</span>
+<span class="nc" id="L583">            Schedule schedule = entry.getValue();</span>
+            
+            // Calculate a simple score (lower is better)
+<span class="nc" id="L586">            double efficiencyScore = schedule.calculateEfficiencyScore();</span>
+<span class="nc" id="L587">            double score = schedule.getTotalCost() - (efficiencyScore * 10);</span>
+<span class="nc bnc" id="L588" title="All 2 branches missed.">            if (score &lt; bestScore) {</span>
+<span class="nc" id="L589">                bestScore = score;</span>
+<span class="nc" id="L590">                bestSchedule = schedule;</span>
+<span class="nc" id="L591">                bestAlgorithm = algorithm;</span>
+            }
+<span class="nc" id="L593">        }</span>
+        
+<span class="nc bnc" id="L595" title="All 2 branches missed.">        if (bestSchedule != null) {</span>
+<span class="nc" id="L596">            displayScheduleDetails(bestSchedule, bestAlgorithm);</span>
+        }
+<span class="nc" id="L598">    }</span>
+    
+    private void displayScheduleDetails(Schedule schedule, String algorithm) {
+<span class="nc" id="L601">        StringBuilder sb = new StringBuilder();</span>
+<span class="nc" id="L602">        sb.append(&quot;BEST SCHEDULE - &quot;).append(algorithm).append(&quot; Algorithm\n&quot;);</span>
+<span class="nc" id="L603">        sb.append(&quot;==========================================\n\n&quot;);</span>
+        
+<span class="nc" id="L605">        sb.append(&quot;Schedule ID: &quot;).append(schedule.getId()).append(&quot;\n&quot;);</span>
+<span class="nc bnc" id="L606" title="All 2 branches missed.">        sb.append(&quot;Start Date: &quot;).append(schedule.getStartDate() != null ? schedule.getStartDate().format(TIME_FORMATTER) : &quot;Not set&quot;).append(&quot;\n&quot;);</span>
+<span class="nc bnc" id="L607" title="All 2 branches missed.">        sb.append(&quot;End Date: &quot;).append(schedule.getEndDate() != null ? schedule.getEndDate().format(TIME_FORMATTER) : &quot;Not set&quot;).append(&quot;\n&quot;);</span>
+<span class="nc" id="L608">        sb.append(&quot;Total Cost: $&quot;).append(String.format(&quot;%.2f&quot;, schedule.getTotalCost())).append(&quot;\n&quot;);</span>
+<span class="nc" id="L609">        sb.append(&quot;Efficiency Score: &quot;).append(String.format(&quot;%.2f&quot;, schedule.calculateEfficiencyScore())).append(&quot;%\n&quot;);</span>
+<span class="nc" id="L610">        sb.append(&quot;Conflict Count: &quot;).append(schedule.getConflictCount()).append(&quot;\n\n&quot;);</span>
+        
+<span class="nc" id="L612">        sb.append(&quot;SCHEDULED APPOINTMENTS:\n&quot;);</span>
+<span class="nc" id="L613">        sb.append(&quot;======================\n&quot;);</span>
+        
+<span class="nc bnc" id="L615" title="All 2 branches missed.">        if (schedule.getAppointments().isEmpty()) {</span>
+<span class="nc" id="L616">            sb.append(&quot;No appointments scheduled.\n&quot;);</span>
+        } else {
+<span class="nc bnc" id="L618" title="All 2 branches missed.">            for (Appointment appointment : schedule.getAppointments()) {</span>
+<span class="nc" id="L619">                sb.append(&quot;• &quot;).append(appointment.getId()).append(&quot; - &quot;).append(appointment.getTitle()).append(&quot;\n&quot;);</span>
+<span class="nc" id="L620">                sb.append(&quot;  Time: &quot;).append(appointment.getStartTime().format(TIME_FORMATTER));</span>
+<span class="nc bnc" id="L621" title="All 2 branches missed.">                if (appointment.getEndTime() != null) {</span>
+<span class="nc" id="L622">                    sb.append(&quot; - &quot;).append(appointment.getEndTime().format(TIME_FORMATTER));</span>
+                }
+<span class="nc" id="L624">                sb.append(&quot;\n&quot;);</span>
+<span class="nc" id="L625">                String resourceId = schedule.getResourceForAppointment(appointment.getId());</span>
+<span class="nc bnc" id="L626" title="All 2 branches missed.">                sb.append(&quot;  Resource: &quot;).append(resourceId != null ? resourceId : &quot;Not assigned&quot;).append(&quot;\n&quot;);</span>
+<span class="nc" id="L627">                sb.append(&quot;  Type: &quot;).append(appointment.getType()).append(&quot; | Priority: &quot;).append(appointment.getPriority()).append(&quot;\n\n&quot;);</span>
+<span class="nc" id="L628">            }</span>
+        }
+        
+<span class="nc" id="L631">        sb.append(&quot;UNSCHEDULED APPOINTMENTS:\n&quot;);</span>
+<span class="nc" id="L632">        sb.append(&quot;========================\n&quot;);</span>
+        
+<span class="nc bnc" id="L634" title="All 2 branches missed.">        if (schedule.getUnassignedAppointments().isEmpty()) {</span>
+<span class="nc" id="L635">            sb.append(&quot;All appointments scheduled successfully!\n&quot;);</span>
+        } else {
+<span class="nc" id="L637">            sb.append(&quot;Unassigned appointment IDs: &quot;).append(String.join(&quot;, &quot;, schedule.getUnassignedAppointments())).append(&quot;\n&quot;);</span>
+        }
+        
+<span class="nc" id="L640">        scheduleArea.setText(sb.toString());</span>
+<span class="nc" id="L641">    }</span>
+
+    private void updateScheduleDisplay(TextArea scheduleArea, ScheduleResult result) {
+        // This would display the actual schedule details
+        // For now, show a summary
+<span class="nc" id="L646">        StringBuilder sb = new StringBuilder();</span>
+<span class="nc" id="L647">        sb.append(&quot;Schedule for &quot;).append(result.getAlgorithmName()).append(&quot;\n&quot;);</span>
+<span class="nc" id="L648">        sb.append(&quot;=====================================\n&quot;);</span>
+<span class="nc" id="L649">        sb.append(&quot;Execution Time: &quot;).append(result.getExecutionTime()).append(&quot; ms\n&quot;);</span>
+<span class="nc" id="L650">        sb.append(&quot;Efficiency: &quot;).append(String.format(&quot;%.2f&quot;, result.getEfficiencyScore())).append(&quot;%\n&quot;);</span>
+<span class="nc" id="L651">        sb.append(&quot;Total Cost: $&quot;).append(String.format(&quot;%.2f&quot;, result.getTotalCost())).append(&quot;\n&quot;);</span>
+<span class="nc" id="L652">        sb.append(&quot;Conflicts: &quot;).append(result.getConflictCount()).append(&quot;\n&quot;);</span>
+        
+<span class="nc" id="L654">        scheduleArea.setText(sb.toString());</span>
+<span class="nc" id="L655">    }</span>
+
+    private void showAddAppointmentDialog() {
+        try {
+<span class="nc" id="L659">            AppointmentDialog dialog = new AppointmentDialog((Stage) appointmentTable.getScene().getWindow(), null);</span>
+<span class="nc" id="L660">            Appointment newAppointment = dialog.showAndWait();</span>
+            
+<span class="nc bnc" id="L662" title="All 2 branches missed.">            if (newAppointment != null) {</span>
+<span class="nc" id="L663">                appointmentDAO.save(newAppointment);</span>
+<span class="nc" id="L664">                loadDataFromDatabase();</span>
+<span class="nc" id="L665">                logArea.appendText(&quot;Added appointment: &quot; + newAppointment.getId() + &quot;\n&quot;);</span>
+            }
+<span class="nc" id="L667">        } catch (Exception e) {</span>
+<span class="nc" id="L668">            logArea.appendText(&quot;Error adding appointment: &quot; + e.getMessage() + &quot;\n&quot;);</span>
+<span class="nc" id="L669">            showAlert(&quot;Error&quot;, &quot;Failed to add appointment: &quot; + e.getMessage());</span>
+<span class="nc" id="L670">        }</span>
+<span class="nc" id="L671">    }</span>
+
+    private void showAddResourceDialog() {
+        try {
+<span class="nc" id="L675">            ResourceDialog dialog = new ResourceDialog((Stage) resourceTable.getScene().getWindow(), null);</span>
+<span class="nc" id="L676">            Resource newResource = dialog.showAndWait();</span>
+            
+<span class="nc bnc" id="L678" title="All 2 branches missed.">            if (newResource != null) {</span>
+<span class="nc" id="L679">                resourceDAO.save(newResource);</span>
+<span class="nc" id="L680">                loadDataFromDatabase();</span>
+<span class="nc" id="L681">                logArea.appendText(&quot;Added resource: &quot; + newResource.getId() + &quot;\n&quot;);</span>
+            }
+<span class="nc" id="L683">        } catch (Exception e) {</span>
+<span class="nc" id="L684">            logArea.appendText(&quot;Error adding resource: &quot; + e.getMessage() + &quot;\n&quot;);</span>
+<span class="nc" id="L685">            showAlert(&quot;Error&quot;, &quot;Failed to add resource: &quot; + e.getMessage());</span>
+<span class="nc" id="L686">        }</span>
+<span class="nc" id="L687">    }</span>
+
+    private void editSelectedAppointment() {
+<span class="nc" id="L690">        Appointment selected = appointmentTable.getSelectionModel().getSelectedItem();</span>
+<span class="nc bnc" id="L691" title="All 2 branches missed.">        if (selected != null) {</span>
+            try {
+<span class="nc" id="L693">                AppointmentDialog dialog = new AppointmentDialog((Stage) appointmentTable.getScene().getWindow(), selected);</span>
+<span class="nc" id="L694">                Appointment updatedAppointment = dialog.showAndWait();</span>
+                
+<span class="nc bnc" id="L696" title="All 2 branches missed.">                if (updatedAppointment != null) {</span>
+<span class="nc" id="L697">                    appointmentDAO.update(updatedAppointment);</span>
+<span class="nc" id="L698">                    loadDataFromDatabase();</span>
+<span class="nc" id="L699">                    logArea.appendText(&quot;Updated appointment: &quot; + updatedAppointment.getId() + &quot;\n&quot;);</span>
+                }
+<span class="nc" id="L701">            } catch (Exception e) {</span>
+<span class="nc" id="L702">                logArea.appendText(&quot;Error updating appointment: &quot; + e.getMessage() + &quot;\n&quot;);</span>
+<span class="nc" id="L703">                showAlert(&quot;Error&quot;, &quot;Failed to update appointment: &quot; + e.getMessage());</span>
+<span class="nc" id="L704">            }</span>
+        } else {
+<span class="nc" id="L706">            showAlert(&quot;Selection Required&quot;, &quot;Please select an appointment to edit.&quot;);</span>
+        }
+<span class="nc" id="L708">    }</span>
+
+    private void deleteSelectedAppointment() {
+<span class="nc" id="L711">        Appointment selected = appointmentTable.getSelectionModel().getSelectedItem();</span>
+<span class="nc bnc" id="L712" title="All 2 branches missed.">        if (selected != null) {</span>
+            try {
+<span class="nc" id="L714">                Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);</span>
+<span class="nc" id="L715">                confirmAlert.setTitle(&quot;Confirm Delete&quot;);</span>
+<span class="nc" id="L716">                confirmAlert.setHeaderText(&quot;Delete Appointment&quot;);</span>
+<span class="nc" id="L717">                confirmAlert.setContentText(&quot;Are you sure you want to delete appointment: &quot; + selected.getId() + &quot;?&quot;);</span>
+                
+<span class="nc bnc" id="L719" title="All 2 branches missed.">                if (confirmAlert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {</span>
+<span class="nc" id="L720">                    appointmentDAO.delete(selected.getId());</span>
+<span class="nc" id="L721">                    loadDataFromDatabase();</span>
+<span class="nc" id="L722">                    logArea.appendText(&quot;Deleted appointment: &quot; + selected.getId() + &quot;\n&quot;);</span>
+                }
+<span class="nc" id="L724">            } catch (Exception e) {</span>
+<span class="nc" id="L725">                logArea.appendText(&quot;Error deleting appointment: &quot; + e.getMessage() + &quot;\n&quot;);</span>
+<span class="nc" id="L726">                showAlert(&quot;Error&quot;, &quot;Failed to delete appointment: &quot; + e.getMessage());</span>
+<span class="nc" id="L727">            }</span>
+        } else {
+<span class="nc" id="L729">            showAlert(&quot;Selection Required&quot;, &quot;Please select an appointment to delete.&quot;);</span>
+        }
+<span class="nc" id="L731">    }</span>
+
+    private void editSelectedResource() {
+<span class="nc" id="L734">        Resource selected = resourceTable.getSelectionModel().getSelectedItem();</span>
+<span class="nc bnc" id="L735" title="All 2 branches missed.">        if (selected != null) {</span>
+            try {
+<span class="nc" id="L737">                ResourceDialog dialog = new ResourceDialog((Stage) resourceTable.getScene().getWindow(), selected);</span>
+<span class="nc" id="L738">                Resource updatedResource = dialog.showAndWait();</span>
+                
+<span class="nc bnc" id="L740" title="All 2 branches missed.">                if (updatedResource != null) {</span>
+<span class="nc" id="L741">                    resourceDAO.update(updatedResource);</span>
+<span class="nc" id="L742">                    loadDataFromDatabase();</span>
+<span class="nc" id="L743">                    logArea.appendText(&quot;Updated resource: &quot; + updatedResource.getId() + &quot;\n&quot;);</span>
+                }
+<span class="nc" id="L745">            } catch (Exception e) {</span>
+<span class="nc" id="L746">                logArea.appendText(&quot;Error updating resource: &quot; + e.getMessage() + &quot;\n&quot;);</span>
+<span class="nc" id="L747">                showAlert(&quot;Error&quot;, &quot;Failed to update resource: &quot; + e.getMessage());</span>
+<span class="nc" id="L748">            }</span>
+        } else {
+<span class="nc" id="L750">            showAlert(&quot;Selection Required&quot;, &quot;Please select a resource to edit.&quot;);</span>
+        }
+<span class="nc" id="L752">    }</span>
+
+    private void deleteSelectedResource() {
+<span class="nc" id="L755">        Resource selected = resourceTable.getSelectionModel().getSelectedItem();</span>
+<span class="nc bnc" id="L756" title="All 2 branches missed.">        if (selected != null) {</span>
+            try {
+<span class="nc" id="L758">                Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);</span>
+<span class="nc" id="L759">                confirmAlert.setTitle(&quot;Confirm Delete&quot;);</span>
+<span class="nc" id="L760">                confirmAlert.setHeaderText(&quot;Delete Resource&quot;);</span>
+<span class="nc" id="L761">                confirmAlert.setContentText(&quot;Are you sure you want to delete resource: &quot; + selected.getId() + &quot;?&quot;);</span>
+                
+<span class="nc bnc" id="L763" title="All 2 branches missed.">                if (confirmAlert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {</span>
+<span class="nc" id="L764">                    resourceDAO.delete(selected.getId());</span>
+<span class="nc" id="L765">                    loadDataFromDatabase();</span>
+<span class="nc" id="L766">                    logArea.appendText(&quot;Deleted resource: &quot; + selected.getId() + &quot;\n&quot;);</span>
+                }
+<span class="nc" id="L768">            } catch (Exception e) {</span>
+<span class="nc" id="L769">                logArea.appendText(&quot;Error deleting resource: &quot; + e.getMessage() + &quot;\n&quot;);</span>
+<span class="nc" id="L770">                showAlert(&quot;Error&quot;, &quot;Failed to delete resource: &quot; + e.getMessage());</span>
+<span class="nc" id="L771">            }</span>
+        } else {
+<span class="nc" id="L773">            showAlert(&quot;Selection Required&quot;, &quot;Please select a resource to delete.&quot;);</span>
+        }
+<span class="nc" id="L775">    }</span>
+
+    private void clearAllData() {
+        try {
+<span class="nc" id="L779">            Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);</span>
+<span class="nc" id="L780">            confirmAlert.setTitle(&quot;Confirm Clear All Data&quot;);</span>
+<span class="nc" id="L781">            confirmAlert.setHeaderText(&quot;Clear All Data&quot;);</span>
+<span class="nc" id="L782">            confirmAlert.setContentText(&quot;Are you sure you want to delete ALL appointments and resources? This action cannot be undone.&quot;);</span>
+            
+<span class="nc bnc" id="L784" title="All 2 branches missed.">            if (confirmAlert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {</span>
+                // Clear database
+<span class="nc" id="L786">                appointmentDAO.deleteAll();</span>
+<span class="nc" id="L787">                resourceDAO.deleteAll();</span>
+                
+                // Clear UI
+<span class="nc" id="L790">                appointments.clear();</span>
+<span class="nc" id="L791">                resources.clear();</span>
+<span class="nc" id="L792">                resultTable.getItems().clear();</span>
+<span class="nc" id="L793">                logArea.clear();</span>
+<span class="nc" id="L794">                statusLabel.setText(&quot;All data cleared&quot;);</span>
+                
+<span class="nc" id="L796">                logArea.appendText(&quot;All data cleared from database\n&quot;);</span>
+            }
+<span class="nc" id="L798">        } catch (Exception e) {</span>
+<span class="nc" id="L799">            logArea.appendText(&quot;Error clearing data: &quot; + e.getMessage() + &quot;\n&quot;);</span>
+<span class="nc" id="L800">            showAlert(&quot;Error&quot;, &quot;Failed to clear data: &quot; + e.getMessage());</span>
+<span class="nc" id="L801">        }</span>
+<span class="nc" id="L802">    }</span>
+
+    private void showAlert(String title, String message) {
+<span class="nc" id="L805">        Alert alert = new Alert(Alert.AlertType.INFORMATION);</span>
+<span class="nc" id="L806">        alert.setTitle(title);</span>
+<span class="nc" id="L807">        alert.setHeaderText(null);</span>
+<span class="nc" id="L808">        alert.setContentText(message);</span>
+<span class="nc" id="L809">        alert.showAndWait();</span>
+<span class="nc" id="L810">    }</span>
+
+    private Appointment createAppointment(String id, AppointmentType type, String description, 
+                                        LocalDateTime startTime, Duration duration, com.vikk.appointmentscheduler.model.Priority priority) {
+<span class="nc" id="L814">        Appointment appointment = new Appointment(id, description, startTime, duration);</span>
+<span class="nc" id="L815">        appointment.setType(type);</span>
+<span class="nc" id="L816">        appointment.setPriority(priority);</span>
+<span class="nc" id="L817">        appointment.setStatus(AppointmentStatus.PENDING);</span>
+<span class="nc" id="L818">        return appointment;</span>
+    }
+
+    public static void main(String[] args) {
+<span class="nc" id="L822">        launch(args);</span>
+<span class="nc" id="L823">    }</span>
+
+    // Helper class for result table
+    public static class ScheduleResult {
+        private final String algorithmName;
+        private final long executionTime;
+        private final int iterations;
+        private final double efficiencyScore;
+        private final double totalCost;
+        private final int conflictCount;
+
+        public ScheduleResult(String algorithmName, long executionTime, int iterations, 
+<span class="nc" id="L835">                            double efficiencyScore, double totalCost, int conflictCount) {</span>
+<span class="nc" id="L836">            this.algorithmName = algorithmName;</span>
+<span class="nc" id="L837">            this.executionTime = executionTime;</span>
+<span class="nc" id="L838">            this.iterations = iterations;</span>
+<span class="nc" id="L839">            this.efficiencyScore = efficiencyScore;</span>
+<span class="nc" id="L840">            this.totalCost = totalCost;</span>
+<span class="nc" id="L841">            this.conflictCount = conflictCount;</span>
+<span class="nc" id="L842">        }</span>
+
+        // Getters
+<span class="nc" id="L845">        public String getAlgorithmName() { return algorithmName; }</span>
+<span class="nc" id="L846">        public long getExecutionTime() { return executionTime; }</span>
+<span class="nc" id="L847">        public int getIterations() { return iterations; }</span>
+<span class="nc" id="L848">        public double getEfficiencyScore() { return efficiencyScore; }</span>
+<span class="nc" id="L849">        public double getTotalCost() { return totalCost; }</span>
+<span class="nc" id="L850">        public int getConflictCount() { return conflictCount; }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

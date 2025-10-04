@@ -141,6 +141,9 @@ public class Schedule {
         if (resourceId != null) {
             resourceAssignments.put(appointment.getId(), resourceId);
             resourceSchedules.computeIfAbsent(resourceId, k -> new ArrayList<>()).add(appointment);
+            
+            // Check for conflicts with existing appointments on the same resource
+            checkForConflicts(appointment, resourceId);
         } else {
             unassignedAppointments.add(appointment.getId());
         }
@@ -178,6 +181,39 @@ public class Schedule {
     public boolean hasConflicts() {
         return conflictCount > 0;
     }
+    
+    /**
+     * Checks for conflicts between the new appointment and existing appointments on the same resource.
+     */
+    private void checkForConflicts(Appointment newAppointment, String resourceId) {
+        List<Appointment> resourceAppointments = resourceSchedules.get(resourceId);
+        if (resourceAppointments == null || resourceAppointments.size() <= 1) {
+            return;
+        }
+        
+        for (Appointment existingAppointment : resourceAppointments) {
+            if (existingAppointment.getId().equals(newAppointment.getId())) {
+                continue; // Skip the same appointment
+            }
+            
+            if (hasTimeConflict(newAppointment, existingAppointment)) {
+                conflictCount++;
+            }
+        }
+    }
+    
+    /**
+     * Checks if two appointments have a time conflict.
+     */
+    private boolean hasTimeConflict(Appointment apt1, Appointment apt2) {
+        LocalDateTime start1 = apt1.getStartTime();
+        LocalDateTime end1 = start1.plus(apt1.getDuration());
+        LocalDateTime start2 = apt2.getStartTime();
+        LocalDateTime end2 = start2.plus(apt2.getDuration());
+        
+        // Check if appointments overlap
+        return start1.isBefore(end2) && start2.isBefore(end1);
+    }
 
     /**
      * Calculates the utilization rate of resources.
@@ -208,6 +244,10 @@ public class Schedule {
      * Calculates the efficiency score of the schedule.
      */
     public double calculateEfficiencyScore() {
+        if (appointments.isEmpty()) {
+            return 0.0;
+        }
+        
         double utilizationScore = calculateUtilizationRate();
         double conflictPenalty = Math.max(0, 1.0 - (conflictCount * 0.1));
         double assignmentScore = unassignedAppointments.isEmpty() ? 1.0 : 

@@ -417,7 +417,7 @@ public class SimulatedAnnealingAlgorithm implements SchedulingAlgorithm {
 
     @Override
     public String getAlgorithmName() {
-        return "Simulated Annealing";
+        return "Simulated Annealing Algorithm";
     }
 
     @Override

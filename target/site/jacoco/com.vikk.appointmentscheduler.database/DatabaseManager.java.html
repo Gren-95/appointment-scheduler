@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DatabaseManager.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Appointment Scheduling Optimizer</a> &gt; <a href="index.source.html" class="el_package">com.vikk.appointmentscheduler.database</a> &gt; <span class="el_source">DatabaseManager.java</span></div><h1>DatabaseManager.java</h1><pre class="source lang-java linenums">package com.vikk.appointmentscheduler.database;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Logger;
+
+/**
+ * Manages database connections and initialization.
+ */
+public class DatabaseManager {
+<span class="fc" id="L13">    private static final Logger logger = Logger.getLogger(DatabaseManager.class.getName());</span>
+    private static final String DB_URL = &quot;jdbc:sqlite:appointment_scheduler.db&quot;;
+    private static DatabaseManager instance;
+    private Connection connection;
+
+<span class="fc" id="L18">    private DatabaseManager() {</span>
+<span class="fc" id="L19">        initializeDatabase();</span>
+<span class="fc" id="L20">    }</span>
+
+    public static synchronized DatabaseManager getInstance() {
+<span class="fc bfc" id="L23" title="All 2 branches covered.">        if (instance == null) {</span>
+<span class="fc" id="L24">            instance = new DatabaseManager();</span>
+        }
+<span class="fc" id="L26">        return instance;</span>
+    }
+
+    public Connection getConnection() throws SQLException {
+        // Always return a fresh connection to avoid &quot;connection closed&quot; issues
+<span class="fc" id="L31">        return DriverManager.getConnection(DB_URL);</span>
+    }
+
+    private void initializeDatabase() {
+<span class="fc" id="L35">        try (Connection conn = DriverManager.getConnection(DB_URL);</span>
+<span class="fc" id="L36">             Statement stmt = conn.createStatement()) {</span>
+            
+            // Create appointments table
+<span class="fc" id="L39">            String createAppointmentsTable = &quot;&quot;&quot;</span>
+                CREATE TABLE IF NOT EXISTS appointments (
+                    id TEXT PRIMARY KEY,
+                    title TEXT NOT NULL,
+                    description TEXT,
+                    start_time TEXT NOT NULL,
+                    end_time TEXT,
+                    duration_minutes INTEGER NOT NULL,
+                    appointment_type TEXT NOT NULL,
+                    priority TEXT NOT NULL,
+                    status TEXT NOT NULL DEFAULT 'PENDING',
+                    resource_id TEXT,
+                    client_id TEXT,
+                    is_flexible BOOLEAN DEFAULT FALSE,
+                    flexibility_window_minutes INTEGER DEFAULT 0,
+                    importance_score REAL DEFAULT 1.0,
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+                )
+            &quot;&quot;&quot;;
+
+            // Create resources table
+<span class="fc" id="L61">            String createResourcesTable = &quot;&quot;&quot;</span>
+                CREATE TABLE IF NOT EXISTS resources (
+                    id TEXT PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    resource_type TEXT NOT NULL,
+                    cost_per_hour REAL NOT NULL DEFAULT 0.0,
+                    capacity INTEGER DEFAULT 1,
+                    is_active BOOLEAN DEFAULT TRUE,
+                    available_from TEXT,
+                    available_to TEXT,
+                    setup_time_minutes INTEGER DEFAULT 0,
+                    cleanup_time_minutes INTEGER DEFAULT 0,
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+                )
+            &quot;&quot;&quot;;
+
+            // Create resource capabilities table
+<span class="fc" id="L79">            String createResourceCapabilitiesTable = &quot;&quot;&quot;</span>
+                CREATE TABLE IF NOT EXISTS resource_capabilities (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    resource_id TEXT NOT NULL,
+                    capability TEXT NOT NULL,
+                    FOREIGN KEY (resource_id) REFERENCES resources (id) ON DELETE CASCADE,
+                    UNIQUE(resource_id, capability)
+                )
+            &quot;&quot;&quot;;
+
+            // Create appointment required capabilities table
+<span class="fc" id="L90">            String createAppointmentCapabilitiesTable = &quot;&quot;&quot;</span>
+                CREATE TABLE IF NOT EXISTS appointment_capabilities (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    appointment_id TEXT NOT NULL,
+                    capability TEXT NOT NULL,
+                    is_required BOOLEAN DEFAULT TRUE,
+                    FOREIGN KEY (appointment_id) REFERENCES appointments (id) ON DELETE CASCADE,
+                    UNIQUE(appointment_id, capability)
+                )
+            &quot;&quot;&quot;;
+
+            // Create schedules table
+<span class="fc" id="L102">            String createSchedulesTable = &quot;&quot;&quot;</span>
+                CREATE TABLE IF NOT EXISTS schedules (
+                    id TEXT PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+                )
+            &quot;&quot;&quot;;
+
+            // Create schedule appointments table
+<span class="fc" id="L112">            String createScheduleAppointmentsTable = &quot;&quot;&quot;</span>
+                CREATE TABLE IF NOT EXISTS schedule_appointments (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    schedule_id TEXT NOT NULL,
+                    appointment_id TEXT NOT NULL,
+                    actual_start_time TEXT,
+                    actual_end_time TEXT,
+                    assigned_resource_id TEXT,
+                    FOREIGN KEY (schedule_id) REFERENCES schedules (id) ON DELETE CASCADE,
+                    FOREIGN KEY (appointment_id) REFERENCES appointments (id) ON DELETE CASCADE,
+                    FOREIGN KEY (assigned_resource_id) REFERENCES resources (id) ON DELETE SET NULL
+                )
+            &quot;&quot;&quot;;
+
+            // Execute table creation
+<span class="fc" id="L127">            stmt.execute(createAppointmentsTable);</span>
+<span class="fc" id="L128">            stmt.execute(createResourcesTable);</span>
+<span class="fc" id="L129">            stmt.execute(createResourceCapabilitiesTable);</span>
+<span class="fc" id="L130">            stmt.execute(createAppointmentCapabilitiesTable);</span>
+<span class="fc" id="L131">            stmt.execute(createSchedulesTable);</span>
+<span class="fc" id="L132">            stmt.execute(createScheduleAppointmentsTable);</span>
+
+            // Create indexes for better performance
+<span class="fc" id="L135">            stmt.execute(&quot;CREATE INDEX IF NOT EXISTS idx_appointments_start_time ON appointments(start_time)&quot;);</span>
+<span class="fc" id="L136">            stmt.execute(&quot;CREATE INDEX IF NOT EXISTS idx_appointments_status ON appointments(status)&quot;);</span>
+<span class="fc" id="L137">            stmt.execute(&quot;CREATE INDEX IF NOT EXISTS idx_resources_type ON resources(resource_type)&quot;);</span>
+<span class="fc" id="L138">            stmt.execute(&quot;CREATE INDEX IF NOT EXISTS idx_resources_active ON resources(is_active)&quot;);</span>
+<span class="fc" id="L139">            stmt.execute(&quot;CREATE INDEX IF NOT EXISTS idx_schedule_appointments_schedule ON schedule_appointments(schedule_id)&quot;);</span>
+
+<span class="fc" id="L141">            logger.info(&quot;Database initialized successfully&quot;);</span>
+            
+<span class="nc" id="L143">        } catch (SQLException e) {</span>
+<span class="nc" id="L144">            logger.severe(&quot;Failed to initialize database: &quot; + e.getMessage());</span>
+<span class="nc" id="L145">            throw new RuntimeException(&quot;Database initialization failed&quot;, e);</span>
+<span class="fc" id="L146">        }</span>
+<span class="fc" id="L147">    }</span>
+
+    public void closeConnection() {
+        try {
+<span class="pc bpc" id="L151" title="3 of 4 branches missed.">            if (connection != null &amp;&amp; !connection.isClosed()) {</span>
+<span class="nc" id="L152">                connection.close();</span>
+            }
+<span class="nc" id="L154">        } catch (SQLException e) {</span>
+<span class="nc" id="L155">            logger.warning(&quot;Failed to close database connection: &quot; + e.getMessage());</span>
+<span class="fc" id="L156">        }</span>
+<span class="fc" id="L157">    }</span>
+
+    public void shutdown() {
+<span class="fc" id="L160">        closeConnection();</span>
+<span class="fc" id="L161">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

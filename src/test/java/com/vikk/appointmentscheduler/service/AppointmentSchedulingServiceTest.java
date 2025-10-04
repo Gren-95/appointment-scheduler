@@ -79,9 +79,9 @@ class AppointmentSchedulingServiceTest {
         Set<String> algorithmNames = algorithms.stream()
                 .map(com.vikk.appointmentscheduler.algorithm.SchedulingAlgorithm::getAlgorithmName)
                 .collect(java.util.stream.Collectors.toSet());
-        assertTrue(algorithmNames.contains("CSP"));
-        assertTrue(algorithmNames.contains("GA"));
-        assertTrue(algorithmNames.contains("SA"));
+        assertTrue(algorithmNames.contains("Constraint Satisfaction Problem (CSP)"));
+        assertTrue(algorithmNames.contains("Genetic Algorithm"));
+        assertTrue(algorithmNames.contains("Simulated Annealing Algorithm"));
     }
 
     @Test

@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GeneticAlgorithm.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Appointment Scheduling Optimizer</a> &gt; <a href="index.source.html" class="el_package">com.vikk.appointmentscheduler.algorithm</a> &gt; <span class="el_source">GeneticAlgorithm.java</span></div><h1>GeneticAlgorithm.java</h1><pre class="source lang-java linenums">package com.vikk.appointmentscheduler.algorithm;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
+
+import com.vikk.appointmentscheduler.model.Appointment;
+import com.vikk.appointmentscheduler.model.Resource;
+import com.vikk.appointmentscheduler.model.Schedule;
+
+/**
+ * Genetic Algorithm for appointment scheduling optimization.
+ * Uses evolutionary approach with selection, crossover, and mutation operations.
+ * 
+ * Time Complexity: O(g * p * n * m) where g=generations, p=population, n=appointments, m=resources
+ * Space Complexity: O(p * n) for population storage
+ */
+public class GeneticAlgorithm implements SchedulingAlgorithm {
+    
+    private static final int DEFAULT_POPULATION_SIZE = 100;
+    private static final int DEFAULT_GENERATIONS = 1000;
+    private static final double MUTATION_RATE = 0.1;
+    private static final double CROSSOVER_RATE = 0.8;
+    private static final double ELITE_PERCENTAGE = 0.1;
+    
+    private final List&lt;Appointment&gt; appointments;
+    private final List&lt;Resource&gt; resources;
+    private final int populationSize;
+    private final int maxGenerations;
+    private long startTime;
+    private int currentGeneration;
+    private double bestFitness;
+    
+    public GeneticAlgorithm(List&lt;Appointment&gt; appointments, List&lt;Resource&gt; resources) {
+<span class="fc" id="L41">        this(appointments, resources, DEFAULT_POPULATION_SIZE, DEFAULT_GENERATIONS);</span>
+<span class="fc" id="L42">    }</span>
+    
+    public GeneticAlgorithm(List&lt;Appointment&gt; appointments, List&lt;Resource&gt; resources, 
+<span class="fc" id="L45">                           int populationSize, int maxGenerations) {</span>
+<span class="fc" id="L46">        this.appointments = new ArrayList&lt;&gt;(appointments);</span>
+<span class="fc" id="L47">        this.resources = new ArrayList&lt;&gt;(resources);</span>
+<span class="fc" id="L48">        this.populationSize = populationSize;</span>
+<span class="fc" id="L49">        this.maxGenerations = maxGenerations;</span>
+<span class="fc" id="L50">        this.currentGeneration = 0;</span>
+<span class="fc" id="L51">        this.bestFitness = Double.NEGATIVE_INFINITY;</span>
+<span class="fc" id="L52">    }</span>
+
+    @Override
+    public Schedule optimize() {
+<span class="fc" id="L56">        startTime = System.currentTimeMillis();</span>
+<span class="fc" id="L57">        currentGeneration = 0;</span>
+<span class="fc" id="L58">        bestFitness = Double.NEGATIVE_INFINITY;</span>
+        
+        // Initialize population
+<span class="fc" id="L61">        List&lt;ScheduleChromosome&gt; population = initializePopulation();</span>
+        
+        // Evolution loop
+<span class="fc bfc" id="L64" title="All 2 branches covered.">        for (currentGeneration = 0; currentGeneration &lt; maxGenerations; currentGeneration++) {</span>
+            // Evaluate fitness
+<span class="fc" id="L66">            evaluatePopulation(population);</span>
+            
+            // Check for convergence
+<span class="fc bfc" id="L69" title="All 2 branches covered.">            if (hasConverged(population)) {</span>
+<span class="fc" id="L70">                break;</span>
+            }
+            
+            // Create new generation
+<span class="fc" id="L74">            List&lt;ScheduleChromosome&gt; newPopulation = new ArrayList&lt;&gt;();</span>
+            
+            // Elitism - keep best individuals
+<span class="fc" id="L77">            int eliteCount = (int) (populationSize * ELITE_PERCENTAGE);</span>
+<span class="fc" id="L78">            population.sort((a, b) -&gt; Double.compare(b.getFitness(), a.getFitness()));</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">            for (int i = 0; i &lt; eliteCount; i++) {</span>
+<span class="fc" id="L80">                newPopulation.add(population.get(i).copy());</span>
+            }
+            
+            // Generate offspring
+<span class="fc bfc" id="L84" title="All 2 branches covered.">            while (newPopulation.size() &lt; populationSize) {</span>
+<span class="fc" id="L85">                ScheduleChromosome parent1 = tournamentSelection(population);</span>
+<span class="fc" id="L86">                ScheduleChromosome parent2 = tournamentSelection(population);</span>
+                
+<span class="fc bfc" id="L88" title="All 2 branches covered.">                if (ThreadLocalRandom.current().nextDouble() &lt; CROSSOVER_RATE) {</span>
+<span class="fc" id="L89">                    ScheduleChromosome[] offspring = crossover(parent1, parent2);</span>
+<span class="fc" id="L90">                    newPopulation.add(offspring[0]);</span>
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">                    if (newPopulation.size() &lt; populationSize) {</span>
+<span class="fc" id="L92">                        newPopulation.add(offspring[1]);</span>
+                    }
+<span class="fc" id="L94">                } else {</span>
+<span class="fc" id="L95">                    newPopulation.add(parent1.copy());</span>
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">                    if (newPopulation.size() &lt; populationSize) {</span>
+<span class="fc" id="L97">                        newPopulation.add(parent2.copy());</span>
+                    }
+                }
+<span class="fc" id="L100">            }</span>
+            
+            // Mutation
+<span class="fc bfc" id="L103" title="All 2 branches covered.">            for (int i = eliteCount; i &lt; newPopulation.size(); i++) {</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">                if (ThreadLocalRandom.current().nextDouble() &lt; MUTATION_RATE) {</span>
+<span class="fc" id="L105">                    mutate(newPopulation.get(i));</span>
+                }
+            }
+            
+<span class="fc" id="L109">            population = newPopulation;</span>
+        }
+        
+        // Return best solution
+<span class="fc" id="L113">        population.sort((a, b) -&gt; Double.compare(b.getFitness(), a.getFitness()));</span>
+<span class="fc" id="L114">        ScheduleChromosome best = population.get(0);</span>
+<span class="fc" id="L115">        return convertToSchedule(best);</span>
+    }
+
+    /**
+     * Initializes the population with random schedules.
+     * Time Complexity: O(p * n * m) where p=population, n=appointments, m=resources
+     */
+    private List&lt;ScheduleChromosome&gt; initializePopulation() {
+<span class="fc" id="L123">        List&lt;ScheduleChromosome&gt; population = new ArrayList&lt;&gt;();</span>
+        
+<span class="fc bfc" id="L125" title="All 2 branches covered.">        for (int i = 0; i &lt; populationSize; i++) {</span>
+<span class="fc" id="L126">            ScheduleChromosome chromosome = new ScheduleChromosome();</span>
+            
+            // Random assignment of resources to appointments
+<span class="fc bfc" id="L129" title="All 2 branches covered.">            for (Appointment appointment : appointments) {</span>
+<span class="fc" id="L130">                List&lt;Resource&gt; validResources = getValidResources(appointment);</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">                if (!validResources.isEmpty()) {</span>
+<span class="fc" id="L132">                    Resource randomResource = validResources.get(</span>
+<span class="fc" id="L133">                        ThreadLocalRandom.current().nextInt(validResources.size()));</span>
+<span class="fc" id="L134">                    chromosome.addAssignment(appointment.getId(), randomResource.getId());</span>
+                }
+<span class="fc" id="L136">            }</span>
+            
+<span class="fc" id="L138">            population.add(chromosome);</span>
+        }
+        
+<span class="fc" id="L141">        return population;</span>
+    }
+
+    /**
+     * Evaluates fitness for all individuals in the population.
+     * Time Complexity: O(p * n * m) where p=population, n=appointments, m=resources
+     */
+    private void evaluatePopulation(List&lt;ScheduleChromosome&gt; population) {
+<span class="fc bfc" id="L149" title="All 2 branches covered.">        for (ScheduleChromosome chromosome : population) {</span>
+<span class="fc" id="L150">            double fitness = calculateFitness(chromosome);</span>
+<span class="fc" id="L151">            chromosome.setFitness(fitness);</span>
+            
+<span class="fc bfc" id="L153" title="All 2 branches covered.">            if (fitness &gt; bestFitness) {</span>
+<span class="fc" id="L154">                bestFitness = fitness;</span>
+            }
+<span class="fc" id="L156">        }</span>
+<span class="fc" id="L157">    }</span>
+
+    /**
+     * Calculates fitness score for a chromosome.
+     * Higher fitness = better solution.
+     * Time Complexity: O(n * m) where n=appointments, m=resources
+     */
+    private double calculateFitness(ScheduleChromosome chromosome) {
+<span class="fc" id="L165">        double score = 0.0;</span>
+<span class="fc" id="L166">        double cost = 0.0;</span>
+<span class="fc" id="L167">        int conflicts = 0;</span>
+<span class="fc" id="L168">        int assignments = 0;</span>
+        
+        // Calculate individual appointment scores
+<span class="fc bfc" id="L171" title="All 2 branches covered.">        for (Appointment appointment : appointments) {</span>
+<span class="fc" id="L172">            String resourceId = chromosome.getAssignment(appointment.getId());</span>
+<span class="fc bfc" id="L173" title="All 2 branches covered.">            if (resourceId != null) {</span>
+<span class="fc" id="L174">                Resource resource = findResourceById(resourceId);</span>
+<span class="pc bpc" id="L175" title="1 of 2 branches missed.">                if (resource != null) {</span>
+<span class="fc" id="L176">                    score += appointment.calculateScore();</span>
+<span class="fc" id="L177">                    cost += resource.calculateCost(appointment.getDuration());</span>
+<span class="fc" id="L178">                    assignments++;</span>
+                    
+                    // Check for conflicts
+<span class="fc" id="L181">                    conflicts += countConflicts(appointment, resourceId, chromosome);</span>
+                }
+            }
+<span class="fc" id="L184">        }</span>
+        
+        // Calculate fitness components
+<span class="fc bfc" id="L187" title="All 2 branches covered.">        double assignmentRate = appointments.size() &gt; 0 ? </span>
+<span class="fc" id="L188">            (double) assignments / appointments.size() : 0.0;</span>
+<span class="fc" id="L189">        double conflictPenalty = Math.max(0, 1.0 - (conflicts * 0.1));</span>
+<span class="fc bfc" id="L190" title="All 2 branches covered.">        double costEfficiency = cost &gt; 0 ? score / cost : score;</span>
+        
+        // Weighted fitness function
+<span class="fc" id="L193">        return (assignmentRate * 0.3 + conflictPenalty * 0.4 + costEfficiency * 0.3) * 100;</span>
+    }
+
+    /**
+     * Counts conflicts for a specific appointment.
+     * Time Complexity: O(n) where n=appointments
+     */
+    private int countConflicts(Appointment appointment, String resourceId, 
+                              ScheduleChromosome chromosome) {
+<span class="fc" id="L202">        int conflicts = 0;</span>
+        
+<span class="fc bfc" id="L204" title="All 2 branches covered.">        for (Appointment other : appointments) {</span>
+<span class="fc bfc" id="L205" title="All 2 branches covered.">            if (!appointment.getId().equals(other.getId())) {</span>
+<span class="fc" id="L206">                String otherResourceId = chromosome.getAssignment(other.getId());</span>
+<span class="fc bfc" id="L207" title="All 4 branches covered.">                if (resourceId.equals(otherResourceId) &amp;&amp; appointment.conflictsWith(other)) {</span>
+<span class="fc" id="L208">                    conflicts++;</span>
+                }
+            }
+<span class="fc" id="L211">        }</span>
+        
+<span class="fc" id="L213">        return conflicts;</span>
+    }
+
+    /**
+     * Tournament selection for parent selection.
+     * Time Complexity: O(1) - constant tournament size
+     */
+    private ScheduleChromosome tournamentSelection(List&lt;ScheduleChromosome&gt; population) {
+<span class="fc" id="L221">        int tournamentSize = Math.min(5, population.size());</span>
+<span class="fc" id="L222">        List&lt;ScheduleChromosome&gt; tournament = new ArrayList&lt;&gt;();</span>
+        
+<span class="fc bfc" id="L224" title="All 2 branches covered.">        for (int i = 0; i &lt; tournamentSize; i++) {</span>
+<span class="fc" id="L225">            int randomIndex = ThreadLocalRandom.current().nextInt(population.size());</span>
+<span class="fc" id="L226">            tournament.add(population.get(randomIndex));</span>
+        }
+        
+<span class="fc" id="L229">        return tournament.stream()</span>
+<span class="fc" id="L230">                .max(Comparator.comparing(ScheduleChromosome::getFitness))</span>
+<span class="fc" id="L231">                .orElse(population.get(0));</span>
+    }
+
+    /**
+     * Crossover operation between two parent chromosomes.
+     * Time Complexity: O(n) where n=appointments
+     */
+    private ScheduleChromosome[] crossover(ScheduleChromosome parent1, ScheduleChromosome parent2) {
+<span class="fc" id="L239">        ScheduleChromosome offspring1 = new ScheduleChromosome();</span>
+<span class="fc" id="L240">        ScheduleChromosome offspring2 = new ScheduleChromosome();</span>
+        
+        // Single-point crossover
+<span class="fc" id="L243">        int crossoverPoint = ThreadLocalRandom.current().nextInt(appointments.size());</span>
+        
+<span class="fc bfc" id="L245" title="All 2 branches covered.">        for (int i = 0; i &lt; appointments.size(); i++) {</span>
+<span class="fc" id="L246">            Appointment appointment = appointments.get(i);</span>
+<span class="fc" id="L247">            String appointmentId = appointment.getId();</span>
+            
+<span class="fc bfc" id="L249" title="All 2 branches covered.">            if (i &lt; crossoverPoint) {</span>
+<span class="fc" id="L250">                offspring1.addAssignment(appointmentId, parent1.getAssignment(appointmentId));</span>
+<span class="fc" id="L251">                offspring2.addAssignment(appointmentId, parent2.getAssignment(appointmentId));</span>
+            } else {
+<span class="fc" id="L253">                offspring1.addAssignment(appointmentId, parent2.getAssignment(appointmentId));</span>
+<span class="fc" id="L254">                offspring2.addAssignment(appointmentId, parent1.getAssignment(appointmentId));</span>
+            }
+        }
+        
+<span class="fc" id="L258">        return new ScheduleChromosome[]{offspring1, offspring2};</span>
+    }
+
+    /**
+     * Mutation operation on a chromosome.
+     * Time Complexity: O(n * m) where n=appointments, m=resources
+     */
+    private void mutate(ScheduleChromosome chromosome) {
+        // Randomly reassign some appointments
+<span class="fc bfc" id="L267" title="All 2 branches covered.">        for (Appointment appointment : appointments) {</span>
+<span class="fc bfc" id="L268" title="All 2 branches covered.">            if (ThreadLocalRandom.current().nextDouble() &lt; 0.1) { // 10% mutation chance per appointment</span>
+<span class="fc" id="L269">                List&lt;Resource&gt; validResources = getValidResources(appointment);</span>
+<span class="pc bpc" id="L270" title="1 of 2 branches missed.">                if (!validResources.isEmpty()) {</span>
+<span class="fc" id="L271">                    Resource newResource = validResources.get(</span>
+<span class="fc" id="L272">                        ThreadLocalRandom.current().nextInt(validResources.size()));</span>
+<span class="fc" id="L273">                    chromosome.addAssignment(appointment.getId(), newResource.getId());</span>
+                }
+            }
+<span class="fc" id="L276">        }</span>
+<span class="fc" id="L277">    }</span>
+
+    /**
+     * Checks if the population has converged.
+     * Time Complexity: O(p) where p=population
+     */
+    private boolean hasConverged(List&lt;ScheduleChromosome&gt; population) {
+<span class="pc bpc" id="L284" title="1 of 2 branches missed.">        if (population.size() &lt; 2) return true;</span>
+        
+<span class="fc" id="L286">        double bestFitness = population.stream()</span>
+<span class="fc" id="L287">                .mapToDouble(ScheduleChromosome::getFitness)</span>
+<span class="fc" id="L288">                .max()</span>
+<span class="fc" id="L289">                .orElse(0.0);</span>
+        
+<span class="fc" id="L291">        double averageFitness = population.stream()</span>
+<span class="fc" id="L292">                .mapToDouble(ScheduleChromosome::getFitness)</span>
+<span class="fc" id="L293">                .average()</span>
+<span class="fc" id="L294">                .orElse(0.0);</span>
+        
+        // Convergence if best and average are close
+<span class="fc bfc" id="L297" title="All 2 branches covered.">        return Math.abs(bestFitness - averageFitness) &lt; 0.01;</span>
+    }
+
+    /**
+     * Gets valid resources for an appointment.
+     * Time Complexity: O(m) where m=resources
+     */
+    private List&lt;Resource&gt; getValidResources(Appointment appointment) {
+<span class="fc" id="L305">        return resources.stream()</span>
+<span class="fc" id="L306">                .filter(Resource::isActive)</span>
+<span class="fc" id="L307">                .filter(resource -&gt; resource.hasRequiredCapabilities(appointment.getRequiredCapabilities()))</span>
+<span class="fc" id="L308">                .filter(resource -&gt; resource.isAvailableAt(appointment.getStartTime(), appointment.getDuration()))</span>
+<span class="fc" id="L309">                .collect(Collectors.toList());</span>
+    }
+
+    /**
+     * Converts a chromosome to a Schedule object.
+     * Time Complexity: O(n) where n=appointments
+     */
+    private Schedule convertToSchedule(ScheduleChromosome chromosome) {
+<span class="fc" id="L317">        Schedule schedule = new Schedule(&quot;GA_&quot; + System.currentTimeMillis(),</span>
+<span class="fc" id="L318">                                       getEarliestStartTime(), getLatestEndTime());</span>
+        
+<span class="fc bfc" id="L320" title="All 2 branches covered.">        for (Appointment appointment : appointments) {</span>
+<span class="fc" id="L321">            String resourceId = chromosome.getAssignment(appointment.getId());</span>
+<span class="fc" id="L322">            schedule.addAppointment(appointment, resourceId);</span>
+<span class="fc" id="L323">        }</span>
+        
+<span class="fc" id="L325">        calculateScheduleMetrics(schedule);</span>
+<span class="fc" id="L326">        return schedule;</span>
+    }
+
+    /**
+     * Calculates comprehensive schedule metrics.
+     * Time Complexity: O(n * m) where n=appointments, m=resources
+     */
+    private void calculateScheduleMetrics(Schedule schedule) {
+<span class="fc" id="L334">        double totalCost = 0.0;</span>
+<span class="fc" id="L335">        double totalScore = 0.0;</span>
+<span class="fc" id="L336">        int conflictCount = 0;</span>
+        
+<span class="fc bfc" id="L338" title="All 2 branches covered.">        for (Appointment appointment : schedule.getAppointments()) {</span>
+<span class="fc" id="L339">            String resourceId = schedule.getResourceForAppointment(appointment.getId());</span>
+<span class="fc bfc" id="L340" title="All 2 branches covered.">            if (resourceId != null) {</span>
+<span class="fc" id="L341">                Resource resource = findResourceById(resourceId);</span>
+<span class="pc bpc" id="L342" title="1 of 2 branches missed.">                if (resource != null) {</span>
+<span class="fc" id="L343">                    totalCost += resource.calculateCost(appointment.getDuration());</span>
+                }
+            }
+            
+<span class="fc" id="L347">            totalScore += appointment.calculateScore();</span>
+            
+            // Count conflicts
+<span class="fc bfc" id="L350" title="All 2 branches covered.">            for (Appointment other : schedule.getAppointments()) {</span>
+<span class="fc bfc" id="L351" title="All 2 branches covered.">                if (!appointment.getId().equals(other.getId()) &amp;&amp; </span>
+<span class="fc bfc" id="L352" title="All 2 branches covered.">                    appointment.conflictsWith(other)) {</span>
+<span class="fc" id="L353">                    conflictCount++;</span>
+                }
+<span class="fc" id="L355">            }</span>
+<span class="fc" id="L356">        }</span>
+        
+<span class="fc" id="L358">        schedule.setTotalCost(totalCost);</span>
+<span class="fc" id="L359">        schedule.setTotalScore(totalScore);</span>
+<span class="fc" id="L360">        schedule.setConflictCount(conflictCount / 2); // Each conflict counted twice</span>
+        
+        // Calculate efficiency score
+<span class="fc" id="L363">        double efficiencyScore = calculateEfficiencyScore(schedule);</span>
+<span class="fc" id="L364">        schedule.getMetrics().setEfficiencyScore(efficiencyScore);</span>
+<span class="fc" id="L365">    }</span>
+
+    /**
+     * Calculates the overall efficiency score of the schedule.
+     * Time Complexity: O(n) where n=appointments
+     */
+    private double calculateEfficiencyScore(Schedule schedule) {
+<span class="fc" id="L372">        double utilizationRate = schedule.calculateUtilizationRate();</span>
+<span class="fc" id="L373">        double conflictPenalty = Math.max(0, 1.0 - (schedule.getConflictCount() * 0.1));</span>
+<span class="fc bfc" id="L374" title="All 2 branches covered.">        double assignmentRate = schedule.getAppointments().size() &gt; 0 ? </span>
+<span class="fc" id="L375">            (double) (schedule.getAppointments().size() - schedule.getUnassignedAppointments().size()) / </span>
+<span class="fc" id="L376">            schedule.getAppointments().size() : 0.0;</span>
+        
+<span class="fc" id="L378">        return (utilizationRate * 0.4 + conflictPenalty * 0.4 + assignmentRate * 0.2) * 100;</span>
+    }
+
+    // Helper methods
+    private Resource findResourceById(String id) {
+<span class="fc" id="L383">        return resources.stream()</span>
+<span class="fc" id="L384">                .filter(res -&gt; res.getId().equals(id))</span>
+<span class="fc" id="L385">                .findFirst()</span>
+<span class="fc" id="L386">                .orElse(null);</span>
+    }
+
+    private LocalDateTime getEarliestStartTime() {
+<span class="fc" id="L390">        return appointments.stream()</span>
+<span class="fc" id="L391">                .map(Appointment::getStartTime)</span>
+<span class="fc" id="L392">                .filter(Objects::nonNull)</span>
+<span class="fc" id="L393">                .min(LocalDateTime::compareTo)</span>
+<span class="fc" id="L394">                .orElse(LocalDateTime.now());</span>
+    }
+
+    private LocalDateTime getLatestEndTime() {
+<span class="fc" id="L398">        return appointments.stream()</span>
+<span class="fc" id="L399">                .map(Appointment::getEndTime)</span>
+<span class="fc" id="L400">                .filter(Objects::nonNull)</span>
+<span class="fc" id="L401">                .max(LocalDateTime::compareTo)</span>
+<span class="fc" id="L402">                .orElse(LocalDateTime.now().plusDays(1));</span>
+    }
+
+    @Override
+    public String getAlgorithmName() {
+<span class="fc" id="L407">        return &quot;Genetic Algorithm&quot;;</span>
+    }
+
+    @Override
+    public long getExecutionTime() {
+<span class="nc" id="L412">        return System.currentTimeMillis() - startTime;</span>
+    }
+
+    @Override
+    public int getBacktrackCount() {
+<span class="fc" id="L417">        return currentGeneration;</span>
+    }
+
+    /**
+     * Chromosome representation for the genetic algorithm.
+     */
+    private static class ScheduleChromosome {
+        private final Map&lt;String, String&gt; assignments; // appointmentId -&gt; resourceId
+        private double fitness;
+
+<span class="fc" id="L427">        public ScheduleChromosome() {</span>
+<span class="fc" id="L428">            this.assignments = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L429">            this.fitness = 0.0;</span>
+<span class="fc" id="L430">        }</span>
+
+        public void addAssignment(String appointmentId, String resourceId) {
+<span class="fc" id="L433">            assignments.put(appointmentId, resourceId);</span>
+<span class="fc" id="L434">        }</span>
+
+        public String getAssignment(String appointmentId) {
+<span class="fc" id="L437">            return assignments.get(appointmentId);</span>
+        }
+
+        public double getFitness() {
+<span class="fc" id="L441">            return fitness;</span>
+        }
+
+        public void setFitness(double fitness) {
+<span class="fc" id="L445">            this.fitness = fitness;</span>
+<span class="fc" id="L446">        }</span>
+
+        public ScheduleChromosome copy() {
+<span class="fc" id="L449">            ScheduleChromosome copy = new ScheduleChromosome();</span>
+<span class="fc" id="L450">            copy.assignments.putAll(this.assignments);</span>
+<span class="fc" id="L451">            copy.fitness = this.fitness;</span>
+<span class="fc" id="L452">            return copy;</span>
+        }
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

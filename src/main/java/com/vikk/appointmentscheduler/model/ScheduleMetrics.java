@@ -3,6 +3,7 @@ package com.vikk.appointmentscheduler.model;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Metrics and statistics for a schedule.
@@ -185,6 +186,57 @@ public class ScheduleMetrics {
                 .min(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
                 .orElse(null);
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ScheduleMetrics that = (ScheduleMetrics) o;
+        return Double.compare(that.totalCost, totalCost) == 0 &&
+                Double.compare(that.averageCostPerAppointment, averageCostPerAppointment) == 0 &&
+                Double.compare(that.totalScore, totalScore) == 0 &&
+                Double.compare(that.averageScorePerAppointment, averageScorePerAppointment) == 0 &&
+                totalAppointments == that.totalAppointments &&
+                assignedAppointments == that.assignedAppointments &&
+                unassignedAppointments == that.unassignedAppointments &&
+                conflictCount == that.conflictCount &&
+                Double.compare(that.utilizationRate, utilizationRate) == 0 &&
+                Double.compare(that.efficiencyScore, efficiencyScore) == 0 &&
+                Objects.equals(totalScheduledTime, that.totalScheduledTime) &&
+                Objects.equals(totalAvailableTime, that.totalAvailableTime) &&
+                Objects.equals(resourceUtilization, that.resourceUtilization) &&
+                Objects.equals(priorityDistribution, that.priorityDistribution) &&
+                Objects.equals(typeDistribution, that.typeDistribution);
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(totalCost, averageCostPerAppointment, totalScore, averageScorePerAppointment,
+                totalAppointments, assignedAppointments, unassignedAppointments, conflictCount,
+                utilizationRate, efficiencyScore, totalScheduledTime, totalAvailableTime,
+                resourceUtilization, priorityDistribution, typeDistribution);
+    }
+    
+    @Override
+    public String toString() {
+        return "ScheduleMetrics{" +
+                "totalCost=" + totalCost +
+                ", averageCostPerAppointment=" + averageCostPerAppointment +
+                ", totalScore=" + totalScore +
+                ", averageScorePerAppointment=" + averageScorePerAppointment +
+                ", totalAppointments=" + totalAppointments +
+                ", assignedAppointments=" + assignedAppointments +
+                ", unassignedAppointments=" + unassignedAppointments +
+                ", conflictCount=" + conflictCount +
+                ", utilizationRate=" + utilizationRate +
+                ", efficiencyScore=" + efficiencyScore +
+                ", totalScheduledTime=" + totalScheduledTime +
+                ", totalAvailableTime=" + totalAvailableTime +
+                ", resourceUtilization=" + resourceUtilization +
+                ", priorityDistribution=" + priorityDistribution +
+                ", typeDistribution=" + typeDistribution +
+                '}';
     }
 }
 

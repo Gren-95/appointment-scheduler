@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AppointmentDialog.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Appointment Scheduling Optimizer</a> &gt; <a href="index.source.html" class="el_package">com.vikk.appointmentscheduler.gui</a> &gt; <span class="el_source">AppointmentDialog.java</span></div><h1>AppointmentDialog.java</h1><pre class="source lang-java linenums">package com.vikk.appointmentscheduler.gui;
+
+import com.vikk.appointmentscheduler.model.Appointment;
+import com.vikk.appointmentscheduler.model.AppointmentStatus;
+import com.vikk.appointmentscheduler.model.AppointmentType;
+import com.vikk.appointmentscheduler.model.Priority;
+
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * Dialog for creating and editing appointments.
+ */
+public class AppointmentDialog {
+<span class="nc" id="L29">    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd HH:mm&quot;);</span>
+    
+    private Stage dialog;
+    private Appointment appointment;
+    private boolean isEdit;
+    
+    // Form controls
+    private TextField idField;
+    private TextField titleField;
+    private TextArea descriptionArea;
+    private DatePicker startDatePicker;
+    private Spinner&lt;Integer&gt; startHourSpinner;
+    private Spinner&lt;Integer&gt; startMinuteSpinner;
+    private Spinner&lt;Integer&gt; durationSpinner;
+    private ComboBox&lt;AppointmentType&gt; typeComboBox;
+    private ComboBox&lt;Priority&gt; priorityComboBox;
+    private ComboBox&lt;AppointmentStatus&gt; statusComboBox;
+    private TextField resourceIdField;
+    private TextField clientIdField;
+    private CheckBox flexibleCheckBox;
+    private Spinner&lt;Integer&gt; flexibilitySpinner;
+    private Spinner&lt;Double&gt; importanceSpinner;
+    private TextArea capabilitiesArea;
+    
+<span class="nc" id="L53">    public AppointmentDialog(Stage parent, Appointment appointment) {</span>
+<span class="nc" id="L54">        this.appointment = appointment;</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">        this.isEdit = appointment != null;</span>
+<span class="nc" id="L56">        createDialog(parent);</span>
+<span class="nc" id="L57">    }</span>
+    
+    private void createDialog(Stage parent) {
+<span class="nc" id="L60">        dialog = new Stage();</span>
+<span class="nc" id="L61">        dialog.initModality(Modality.APPLICATION_MODAL);</span>
+<span class="nc" id="L62">        dialog.initOwner(parent);</span>
+<span class="nc bnc" id="L63" title="All 2 branches missed.">        dialog.setTitle(isEdit ? &quot;Edit Appointment&quot; : &quot;Add New Appointment&quot;);</span>
+<span class="nc" id="L64">        dialog.setResizable(true);</span>
+        
+<span class="nc" id="L66">        VBox mainLayout = new VBox(15);</span>
+<span class="nc" id="L67">        mainLayout.setPadding(new Insets(20));</span>
+        
+        // Create form
+<span class="nc" id="L70">        GridPane form = createForm();</span>
+<span class="nc" id="L71">        mainLayout.getChildren().add(form);</span>
+        
+        // Create buttons
+<span class="nc" id="L74">        HBox buttonBox = createButtons();</span>
+<span class="nc" id="L75">        mainLayout.getChildren().add(buttonBox);</span>
+        
+<span class="nc" id="L77">        Scene scene = new Scene(mainLayout, 700, 800);</span>
+<span class="nc" id="L78">        dialog.setScene(scene);</span>
+        
+        // Populate form if editing
+<span class="nc bnc" id="L81" title="All 2 branches missed.">        if (isEdit) {</span>
+<span class="nc" id="L82">            populateForm();</span>
+        }
+<span class="nc" id="L84">    }</span>
+    
+    private GridPane createForm() {
+<span class="nc" id="L87">        GridPane form = new GridPane();</span>
+<span class="nc" id="L88">        form.setHgap(15);</span>
+<span class="nc" id="L89">        form.setVgap(12);</span>
+<span class="nc" id="L90">        form.setPadding(new Insets(10));</span>
+        
+        // Set column constraints for better layout
+<span class="nc" id="L93">        ColumnConstraints labelCol = new ColumnConstraints();</span>
+<span class="nc" id="L94">        labelCol.setMinWidth(150);</span>
+<span class="nc" id="L95">        labelCol.setPrefWidth(150);</span>
+        
+<span class="nc" id="L97">        ColumnConstraints fieldCol = new ColumnConstraints();</span>
+<span class="nc" id="L98">        fieldCol.setMinWidth(200);</span>
+<span class="nc" id="L99">        fieldCol.setPrefWidth(300);</span>
+<span class="nc" id="L100">        fieldCol.setHgrow(javafx.scene.layout.Priority.ALWAYS);</span>
+        
+<span class="nc" id="L102">        form.getColumnConstraints().addAll(labelCol, fieldCol);</span>
+        
+<span class="nc" id="L104">        int row = 0;</span>
+        
+        // ID
+<span class="nc" id="L107">        form.add(new Label(&quot;ID:&quot;), 0, row);</span>
+<span class="nc" id="L108">        idField = new TextField();</span>
+<span class="nc" id="L109">        idField.setPromptText(&quot;e.g., APT001&quot;);</span>
+<span class="nc" id="L110">        form.add(idField, 1, row++);</span>
+        
+        // Title
+<span class="nc" id="L113">        form.add(new Label(&quot;Title:&quot;), 0, row);</span>
+<span class="nc" id="L114">        titleField = new TextField();</span>
+<span class="nc" id="L115">        titleField.setPromptText(&quot;Appointment title&quot;);</span>
+<span class="nc" id="L116">        form.add(titleField, 1, row++);</span>
+        
+        // Description
+<span class="nc" id="L119">        form.add(new Label(&quot;Description:&quot;), 0, row);</span>
+<span class="nc" id="L120">        descriptionArea = new TextArea();</span>
+<span class="nc" id="L121">        descriptionArea.setPromptText(&quot;Appointment description&quot;);</span>
+<span class="nc" id="L122">        descriptionArea.setPrefRowCount(3);</span>
+<span class="nc" id="L123">        form.add(descriptionArea, 1, row++);</span>
+        
+        // Start Date and Time
+<span class="nc" id="L126">        form.add(new Label(&quot;Start Date:&quot;), 0, row);</span>
+<span class="nc" id="L127">        startDatePicker = new DatePicker();</span>
+<span class="nc" id="L128">        startDatePicker.setValue(LocalDateTime.now().toLocalDate());</span>
+<span class="nc" id="L129">        form.add(startDatePicker, 1, row++);</span>
+        
+<span class="nc" id="L131">        form.add(new Label(&quot;Start Time:&quot;), 0, row);</span>
+<span class="nc" id="L132">        HBox timeBox = new HBox(5);</span>
+<span class="nc" id="L133">        startHourSpinner = new Spinner&lt;&gt;(0, 23, LocalDateTime.now().getHour());</span>
+<span class="nc" id="L134">        startMinuteSpinner = new Spinner&lt;&gt;(0, 59, LocalDateTime.now().getMinute());</span>
+<span class="nc" id="L135">        timeBox.getChildren().addAll(</span>
+            new Label(&quot;Hour:&quot;), startHourSpinner,
+            new Label(&quot;Min:&quot;), startMinuteSpinner
+        );
+<span class="nc" id="L139">        form.add(timeBox, 1, row++);</span>
+        
+        // Duration
+<span class="nc" id="L142">        form.add(new Label(&quot;Duration (min):&quot;), 0, row);</span>
+<span class="nc" id="L143">        durationSpinner = new Spinner&lt;&gt;(15, 480, 60);</span>
+<span class="nc" id="L144">        durationSpinner.setEditable(true);</span>
+<span class="nc" id="L145">        form.add(durationSpinner, 1, row++);</span>
+        
+        // Type
+<span class="nc" id="L148">        form.add(new Label(&quot;Type:&quot;), 0, row);</span>
+<span class="nc" id="L149">        typeComboBox = new ComboBox&lt;&gt;();</span>
+<span class="nc" id="L150">        typeComboBox.getItems().addAll(AppointmentType.values());</span>
+<span class="nc" id="L151">        typeComboBox.setValue(AppointmentType.CONSULTATION);</span>
+<span class="nc" id="L152">        form.add(typeComboBox, 1, row++);</span>
+        
+        // Priority
+<span class="nc" id="L155">        form.add(new Label(&quot;Priority:&quot;), 0, row);</span>
+<span class="nc" id="L156">        priorityComboBox = new ComboBox&lt;&gt;();</span>
+<span class="nc" id="L157">        priorityComboBox.getItems().addAll(Priority.values());</span>
+<span class="nc" id="L158">        priorityComboBox.setValue(Priority.MEDIUM);</span>
+<span class="nc" id="L159">        form.add(priorityComboBox, 1, row++);</span>
+        
+        // Status
+<span class="nc" id="L162">        form.add(new Label(&quot;Status:&quot;), 0, row);</span>
+<span class="nc" id="L163">        statusComboBox = new ComboBox&lt;&gt;();</span>
+<span class="nc" id="L164">        statusComboBox.getItems().addAll(AppointmentStatus.values());</span>
+<span class="nc" id="L165">        statusComboBox.setValue(AppointmentStatus.PENDING);</span>
+<span class="nc" id="L166">        form.add(statusComboBox, 1, row++);</span>
+        
+        // Resource ID
+<span class="nc" id="L169">        form.add(new Label(&quot;Resource ID:&quot;), 0, row);</span>
+<span class="nc" id="L170">        resourceIdField = new TextField();</span>
+<span class="nc" id="L171">        resourceIdField.setPromptText(&quot;Optional - will be assigned by scheduler&quot;);</span>
+<span class="nc" id="L172">        form.add(resourceIdField, 1, row++);</span>
+        
+        // Client ID
+<span class="nc" id="L175">        form.add(new Label(&quot;Client ID:&quot;), 0, row);</span>
+<span class="nc" id="L176">        clientIdField = new TextField();</span>
+<span class="nc" id="L177">        clientIdField.setPromptText(&quot;Client identifier&quot;);</span>
+<span class="nc" id="L178">        form.add(clientIdField, 1, row++);</span>
+        
+        // Flexible
+<span class="nc" id="L181">        form.add(new Label(&quot;Flexible:&quot;), 0, row);</span>
+<span class="nc" id="L182">        flexibleCheckBox = new CheckBox(&quot;Appointment time can be adjusted&quot;);</span>
+<span class="nc" id="L183">        form.add(flexibleCheckBox, 1, row++);</span>
+        
+        // Flexibility Window
+<span class="nc" id="L186">        form.add(new Label(&quot;Flexibility (min):&quot;), 0, row);</span>
+<span class="nc" id="L187">        flexibilitySpinner = new Spinner&lt;&gt;(0, 240, 30);</span>
+<span class="nc" id="L188">        flexibilitySpinner.setEditable(true);</span>
+<span class="nc" id="L189">        form.add(flexibilitySpinner, 1, row++);</span>
+        
+        // Importance Score
+<span class="nc" id="L192">        form.add(new Label(&quot;Importance Score:&quot;), 0, row);</span>
+<span class="nc" id="L193">        importanceSpinner = new Spinner&lt;&gt;(0.1, 10.0, 1.0, 0.1);</span>
+<span class="nc" id="L194">        importanceSpinner.setEditable(true);</span>
+<span class="nc" id="L195">        form.add(importanceSpinner, 1, row++);</span>
+        
+        // Capabilities
+<span class="nc" id="L198">        form.add(new Label(&quot;Required Capabilities:&quot;), 0, row);</span>
+<span class="nc" id="L199">        capabilitiesArea = new TextArea();</span>
+<span class="nc" id="L200">        capabilitiesArea.setPromptText(&quot;Enter capabilities separated by commas (e.g., CONSULTATION, EMERGENCY)&quot;);</span>
+<span class="nc" id="L201">        capabilitiesArea.setPrefRowCount(2);</span>
+<span class="nc" id="L202">        form.add(capabilitiesArea, 1, row++);</span>
+        
+<span class="nc" id="L204">        return form;</span>
+    }
+    
+    private HBox createButtons() {
+<span class="nc" id="L208">        HBox buttonBox = new HBox(10);</span>
+<span class="nc" id="L209">        buttonBox.setPadding(new Insets(20, 0, 0, 0));</span>
+        
+<span class="nc bnc" id="L211" title="All 2 branches missed.">        Button saveButton = new Button(isEdit ? &quot;Update&quot; : &quot;Save&quot;);</span>
+<span class="nc" id="L212">        saveButton.setDefaultButton(true);</span>
+<span class="nc" id="L213">        saveButton.setOnAction(e -&gt; saveAppointment());</span>
+        
+<span class="nc" id="L215">        Button cancelButton = new Button(&quot;Cancel&quot;);</span>
+<span class="nc" id="L216">        cancelButton.setOnAction(e -&gt; dialog.close());</span>
+        
+<span class="nc" id="L218">        buttonBox.getChildren().addAll(saveButton, cancelButton);</span>
+        
+<span class="nc" id="L220">        return buttonBox;</span>
+    }
+    
+    private void populateForm() {
+<span class="nc bnc" id="L224" title="All 2 branches missed.">        if (appointment == null) return;</span>
+        
+<span class="nc" id="L226">        idField.setText(appointment.getId());</span>
+<span class="nc" id="L227">        titleField.setText(appointment.getTitle());</span>
+<span class="nc" id="L228">        descriptionArea.setText(appointment.getDescription());</span>
+        
+<span class="nc bnc" id="L230" title="All 2 branches missed.">        if (appointment.getStartTime() != null) {</span>
+<span class="nc" id="L231">            startDatePicker.setValue(appointment.getStartTime().toLocalDate());</span>
+<span class="nc" id="L232">            startHourSpinner.getValueFactory().setValue(appointment.getStartTime().getHour());</span>
+<span class="nc" id="L233">            startMinuteSpinner.getValueFactory().setValue(appointment.getStartTime().getMinute());</span>
+        }
+        
+<span class="nc" id="L236">        durationSpinner.getValueFactory().setValue((int) appointment.getDurationMinutes());</span>
+<span class="nc" id="L237">        typeComboBox.setValue(appointment.getType());</span>
+<span class="nc" id="L238">        priorityComboBox.setValue(appointment.getPriority());</span>
+<span class="nc" id="L239">        statusComboBox.setValue(appointment.getStatus());</span>
+<span class="nc" id="L240">        resourceIdField.setText(appointment.getResourceId());</span>
+<span class="nc" id="L241">        clientIdField.setText(appointment.getClientId());</span>
+<span class="nc" id="L242">        flexibleCheckBox.setSelected(appointment.isFlexible());</span>
+<span class="nc" id="L243">        flexibilitySpinner.getValueFactory().setValue((int) appointment.getFlexibilityWindow().toMinutes());</span>
+<span class="nc" id="L244">        importanceSpinner.getValueFactory().setValue(appointment.getImportanceScore());</span>
+        
+        // Capabilities
+<span class="nc" id="L247">        Set&lt;String&gt; allCapabilities = new HashSet&lt;&gt;(appointment.getRequiredCapabilities());</span>
+<span class="nc" id="L248">        allCapabilities.addAll(appointment.getPreferredCapabilities());</span>
+<span class="nc" id="L249">        capabilitiesArea.setText(String.join(&quot;, &quot;, allCapabilities));</span>
+<span class="nc" id="L250">    }</span>
+    
+    private void saveAppointment() {
+        try {
+            // Validate required fields
+<span class="nc bnc" id="L255" title="All 2 branches missed.">            if (idField.getText().trim().isEmpty()) {</span>
+<span class="nc" id="L256">                showAlert(&quot;Validation Error&quot;, &quot;ID is required&quot;);</span>
+<span class="nc" id="L257">                return;</span>
+            }
+<span class="nc bnc" id="L259" title="All 2 branches missed.">            if (titleField.getText().trim().isEmpty()) {</span>
+<span class="nc" id="L260">                showAlert(&quot;Validation Error&quot;, &quot;Title is required&quot;);</span>
+<span class="nc" id="L261">                return;</span>
+            }
+<span class="nc bnc" id="L263" title="All 2 branches missed.">            if (startDatePicker.getValue() == null) {</span>
+<span class="nc" id="L264">                showAlert(&quot;Validation Error&quot;, &quot;Start date is required&quot;);</span>
+<span class="nc" id="L265">                return;</span>
+            }
+            
+            // Create or update appointment
+<span class="nc bnc" id="L269" title="All 2 branches missed.">            if (appointment == null) {</span>
+<span class="nc" id="L270">                appointment = new Appointment();</span>
+            }
+            
+<span class="nc" id="L273">            appointment.setId(idField.getText().trim());</span>
+<span class="nc" id="L274">            appointment.setTitle(titleField.getText().trim());</span>
+<span class="nc" id="L275">            appointment.setDescription(descriptionArea.getText().trim());</span>
+            
+            // Set start time
+<span class="nc" id="L278">            LocalDateTime startTime = LocalDateTime.of(</span>
+<span class="nc" id="L279">                startDatePicker.getValue(),</span>
+<span class="nc" id="L280">                LocalTime.of(startHourSpinner.getValue().intValue(), startMinuteSpinner.getValue().intValue())</span>
+            );
+<span class="nc" id="L282">            appointment.setStartTime(startTime);</span>
+            
+            // Set duration and end time
+<span class="nc" id="L285">            int durationMinutes = durationSpinner.getValue();</span>
+<span class="nc" id="L286">            appointment.setDuration(Duration.ofMinutes(durationMinutes));</span>
+<span class="nc" id="L287">            appointment.setEndTime(startTime.plusMinutes(durationMinutes));</span>
+            
+<span class="nc" id="L289">            appointment.setType(typeComboBox.getValue());</span>
+<span class="nc" id="L290">            appointment.setPriority(priorityComboBox.getValue());</span>
+<span class="nc" id="L291">            appointment.setStatus(statusComboBox.getValue());</span>
+<span class="nc" id="L292">            appointment.setResourceId(resourceIdField.getText().trim());</span>
+<span class="nc" id="L293">            appointment.setClientId(clientIdField.getText().trim());</span>
+<span class="nc" id="L294">            appointment.setFlexible(flexibleCheckBox.isSelected());</span>
+<span class="nc" id="L295">            appointment.setFlexibilityWindow(Duration.ofMinutes(flexibilitySpinner.getValue()));</span>
+<span class="nc" id="L296">            appointment.setImportanceScore(importanceSpinner.getValue());</span>
+            
+            // Parse capabilities
+<span class="nc" id="L299">            String capabilitiesText = capabilitiesArea.getText().trim();</span>
+<span class="nc" id="L300">            Set&lt;String&gt; capabilities = new HashSet&lt;&gt;();</span>
+<span class="nc bnc" id="L301" title="All 2 branches missed.">            if (!capabilitiesText.isEmpty()) {</span>
+<span class="nc" id="L302">                String[] parts = capabilitiesText.split(&quot;,&quot;);</span>
+<span class="nc bnc" id="L303" title="All 2 branches missed.">                for (String part : parts) {</span>
+<span class="nc" id="L304">                    capabilities.add(part.trim().toUpperCase());</span>
+                }
+            }
+<span class="nc" id="L307">            appointment.setRequiredCapabilities(capabilities);</span>
+<span class="nc" id="L308">            appointment.setPreferredCapabilities(new HashSet&lt;&gt;());</span>
+            
+<span class="nc" id="L310">            dialog.close();</span>
+            
+<span class="nc" id="L312">        } catch (Exception e) {</span>
+<span class="nc" id="L313">            showAlert(&quot;Error&quot;, &quot;Failed to save appointment: &quot; + e.getMessage());</span>
+<span class="nc" id="L314">        }</span>
+<span class="nc" id="L315">    }</span>
+    
+    private void showAlert(String title, String message) {
+<span class="nc" id="L318">        Alert alert = new Alert(Alert.AlertType.ERROR);</span>
+<span class="nc" id="L319">        alert.setTitle(title);</span>
+<span class="nc" id="L320">        alert.setHeaderText(null);</span>
+<span class="nc" id="L321">        alert.setContentText(message);</span>
+<span class="nc" id="L322">        alert.showAndWait();</span>
+<span class="nc" id="L323">    }</span>
+    
+    public Appointment showAndWait() {
+<span class="nc" id="L326">        dialog.showAndWait();</span>
+<span class="nc" id="L327">        return appointment;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

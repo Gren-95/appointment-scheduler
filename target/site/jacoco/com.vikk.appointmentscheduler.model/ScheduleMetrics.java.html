@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ScheduleMetrics.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Appointment Scheduling Optimizer</a> &gt; <a href="index.source.html" class="el_package">com.vikk.appointmentscheduler.model</a> &gt; <span class="el_source">ScheduleMetrics.java</span></div><h1>ScheduleMetrics.java</h1><pre class="source lang-java linenums">package com.vikk.appointmentscheduler.model;
+
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
+/**
+ * Metrics and statistics for a schedule.
+ */
+public class ScheduleMetrics {
+    private double totalCost;
+    private double averageCostPerAppointment;
+    private double totalScore;
+    private double averageScorePerAppointment;
+    private int totalAppointments;
+    private int assignedAppointments;
+    private int unassignedAppointments;
+    private int conflictCount;
+    private double utilizationRate;
+    private double efficiencyScore;
+    private Duration totalScheduledTime;
+    private Duration totalAvailableTime;
+    private Map&lt;String, Integer&gt; resourceUtilization;
+    private Map&lt;Priority, Integer&gt; priorityDistribution;
+    private Map&lt;AppointmentType, Integer&gt; typeDistribution;
+
+<span class="fc" id="L28">    public ScheduleMetrics() {</span>
+<span class="fc" id="L29">        this.resourceUtilization = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L30">        this.priorityDistribution = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L31">        this.typeDistribution = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L32">        this.totalScheduledTime = Duration.ZERO;</span>
+<span class="fc" id="L33">        this.totalAvailableTime = Duration.ZERO;</span>
+<span class="fc" id="L34">    }</span>
+
+    // Getters and setters
+    public double getTotalCost() {
+<span class="fc" id="L38">        return totalCost;</span>
+    }
+
+    public void setTotalCost(double totalCost) {
+<span class="fc" id="L42">        this.totalCost = totalCost;</span>
+<span class="fc" id="L43">    }</span>
+
+    public double getAverageCostPerAppointment() {
+<span class="fc" id="L46">        return averageCostPerAppointment;</span>
+    }
+
+    public void setAverageCostPerAppointment(double averageCostPerAppointment) {
+<span class="fc" id="L50">        this.averageCostPerAppointment = averageCostPerAppointment;</span>
+<span class="fc" id="L51">    }</span>
+
+    public double getTotalScore() {
+<span class="nc" id="L54">        return totalScore;</span>
+    }
+
+    public void setTotalScore(double totalScore) {
+<span class="nc" id="L58">        this.totalScore = totalScore;</span>
+<span class="nc" id="L59">    }</span>
+
+    public double getAverageScorePerAppointment() {
+<span class="nc" id="L62">        return averageScorePerAppointment;</span>
+    }
+
+    public void setAverageScorePerAppointment(double averageScorePerAppointment) {
+<span class="nc" id="L66">        this.averageScorePerAppointment = averageScorePerAppointment;</span>
+<span class="nc" id="L67">    }</span>
+
+    public int getTotalAppointments() {
+<span class="fc" id="L70">        return totalAppointments;</span>
+    }
+
+    public void setTotalAppointments(int totalAppointments) {
+<span class="fc" id="L74">        this.totalAppointments = totalAppointments;</span>
+<span class="fc" id="L75">    }</span>
+
+    public int getAssignedAppointments() {
+<span class="fc" id="L78">        return assignedAppointments;</span>
+    }
+
+    public void setAssignedAppointments(int assignedAppointments) {
+<span class="fc" id="L82">        this.assignedAppointments = assignedAppointments;</span>
+<span class="fc" id="L83">    }</span>
+
+    public int getUnassignedAppointments() {
+<span class="fc" id="L86">        return unassignedAppointments;</span>
+    }
+
+    public void setUnassignedAppointments(int unassignedAppointments) {
+<span class="fc" id="L90">        this.unassignedAppointments = unassignedAppointments;</span>
+<span class="fc" id="L91">    }</span>
+
+    public int getConflictCount() {
+<span class="fc" id="L94">        return conflictCount;</span>
+    }
+
+    public void setConflictCount(int conflictCount) {
+<span class="fc" id="L98">        this.conflictCount = conflictCount;</span>
+<span class="fc" id="L99">    }</span>
+
+    public double getUtilizationRate() {
+<span class="fc" id="L102">        return utilizationRate;</span>
+    }
+
+    public void setUtilizationRate(double utilizationRate) {
+<span class="fc" id="L106">        this.utilizationRate = utilizationRate;</span>
+<span class="fc" id="L107">    }</span>
+
+    public double getEfficiencyScore() {
+<span class="fc" id="L110">        return efficiencyScore;</span>
+    }
+
+    public void setEfficiencyScore(double efficiencyScore) {
+<span class="fc" id="L114">        this.efficiencyScore = efficiencyScore;</span>
+<span class="fc" id="L115">    }</span>
+
+    public Duration getTotalScheduledTime() {
+<span class="nc" id="L118">        return totalScheduledTime;</span>
+    }
+
+    public void setTotalScheduledTime(Duration totalScheduledTime) {
+<span class="nc" id="L122">        this.totalScheduledTime = totalScheduledTime;</span>
+<span class="nc" id="L123">    }</span>
+
+    public Duration getTotalAvailableTime() {
+<span class="nc" id="L126">        return totalAvailableTime;</span>
+    }
+
+    public void setTotalAvailableTime(Duration totalAvailableTime) {
+<span class="nc" id="L130">        this.totalAvailableTime = totalAvailableTime;</span>
+<span class="nc" id="L131">    }</span>
+
+    public Map&lt;String, Integer&gt; getResourceUtilization() {
+<span class="fc" id="L134">        return resourceUtilization;</span>
+    }
+
+    public void setResourceUtilization(Map&lt;String, Integer&gt; resourceUtilization) {
+<span class="nc" id="L138">        this.resourceUtilization = resourceUtilization;</span>
+<span class="nc" id="L139">    }</span>
+
+    public Map&lt;Priority, Integer&gt; getPriorityDistribution() {
+<span class="nc" id="L142">        return priorityDistribution;</span>
+    }
+
+    public void setPriorityDistribution(Map&lt;Priority, Integer&gt; priorityDistribution) {
+<span class="nc" id="L146">        this.priorityDistribution = priorityDistribution;</span>
+<span class="nc" id="L147">    }</span>
+
+    public Map&lt;AppointmentType, Integer&gt; getTypeDistribution() {
+<span class="nc" id="L150">        return typeDistribution;</span>
+    }
+
+    public void setTypeDistribution(Map&lt;AppointmentType, Integer&gt; typeDistribution) {
+<span class="nc" id="L154">        this.typeDistribution = typeDistribution;</span>
+<span class="nc" id="L155">    }</span>
+
+    /**
+     * Calculates the assignment rate (percentage of appointments that are assigned).
+     */
+    public double getAssignmentRate() {
+<span class="fc bfc" id="L161" title="All 2 branches covered.">        return totalAppointments &gt; 0 ? (double) assignedAppointments / totalAppointments * 100 : 0.0;</span>
+    }
+
+    /**
+     * Calculates the conflict rate (percentage of appointments with conflicts).
+     */
+    public double getConflictRate() {
+<span class="fc bfc" id="L168" title="All 2 branches covered.">        return totalAppointments &gt; 0 ? (double) conflictCount / totalAppointments * 100 : 0.0;</span>
+    }
+
+    /**
+     * Gets the most utilized resource.
+     */
+    public String getMostUtilizedResource() {
+<span class="fc" id="L175">        return resourceUtilization.entrySet().stream()</span>
+<span class="fc" id="L176">                .max(Map.Entry.comparingByValue())</span>
+<span class="fc" id="L177">                .map(Map.Entry::getKey)</span>
+<span class="fc" id="L178">                .orElse(null);</span>
+    }
+
+    /**
+     * Gets the least utilized resource.
+     */
+    public String getLeastUtilizedResource() {
+<span class="fc" id="L185">        return resourceUtilization.entrySet().stream()</span>
+<span class="fc" id="L186">                .min(Map.Entry.comparingByValue())</span>
+<span class="fc" id="L187">                .map(Map.Entry::getKey)</span>
+<span class="fc" id="L188">                .orElse(null);</span>
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+<span class="fc bfc" id="L193" title="All 2 branches covered.">        if (this == o) return true;</span>
+<span class="pc bpc" id="L194" title="2 of 4 branches missed.">        if (o == null || getClass() != o.getClass()) return false;</span>
+<span class="fc" id="L195">        ScheduleMetrics that = (ScheduleMetrics) o;</span>
+<span class="pc bpc" id="L196" title="1 of 2 branches missed.">        return Double.compare(that.totalCost, totalCost) == 0 &amp;&amp;</span>
+<span class="pc bpc" id="L197" title="1 of 2 branches missed.">                Double.compare(that.averageCostPerAppointment, averageCostPerAppointment) == 0 &amp;&amp;</span>
+<span class="pc bpc" id="L198" title="1 of 2 branches missed.">                Double.compare(that.totalScore, totalScore) == 0 &amp;&amp;</span>
+<span class="pc bpc" id="L199" title="4 of 10 branches missed.">                Double.compare(that.averageScorePerAppointment, averageScorePerAppointment) == 0 &amp;&amp;</span>
+                totalAppointments == that.totalAppointments &amp;&amp;
+                assignedAppointments == that.assignedAppointments &amp;&amp;
+                unassignedAppointments == that.unassignedAppointments &amp;&amp;
+                conflictCount == that.conflictCount &amp;&amp;
+<span class="pc bpc" id="L204" title="1 of 2 branches missed.">                Double.compare(that.utilizationRate, utilizationRate) == 0 &amp;&amp;</span>
+<span class="pc bpc" id="L205" title="1 of 2 branches missed.">                Double.compare(that.efficiencyScore, efficiencyScore) == 0 &amp;&amp;</span>
+<span class="pc bpc" id="L206" title="1 of 2 branches missed.">                Objects.equals(totalScheduledTime, that.totalScheduledTime) &amp;&amp;</span>
+<span class="pc bpc" id="L207" title="1 of 2 branches missed.">                Objects.equals(totalAvailableTime, that.totalAvailableTime) &amp;&amp;</span>
+<span class="pc bpc" id="L208" title="1 of 2 branches missed.">                Objects.equals(resourceUtilization, that.resourceUtilization) &amp;&amp;</span>
+<span class="pc bpc" id="L209" title="1 of 2 branches missed.">                Objects.equals(priorityDistribution, that.priorityDistribution) &amp;&amp;</span>
+<span class="pc bpc" id="L210" title="1 of 2 branches missed.">                Objects.equals(typeDistribution, that.typeDistribution);</span>
+    }
+    
+    @Override
+    public int hashCode() {
+<span class="fc" id="L215">        return Objects.hash(totalCost, averageCostPerAppointment, totalScore, averageScorePerAppointment,</span>
+<span class="fc" id="L216">                totalAppointments, assignedAppointments, unassignedAppointments, conflictCount,</span>
+<span class="fc" id="L217">                utilizationRate, efficiencyScore, totalScheduledTime, totalAvailableTime,</span>
+                resourceUtilization, priorityDistribution, typeDistribution);
+    }
+    
+    @Override
+    public String toString() {
+<span class="fc" id="L223">        return &quot;ScheduleMetrics{&quot; +</span>
+                &quot;totalCost=&quot; + totalCost +
+                &quot;, averageCostPerAppointment=&quot; + averageCostPerAppointment +
+                &quot;, totalScore=&quot; + totalScore +
+                &quot;, averageScorePerAppointment=&quot; + averageScorePerAppointment +
+                &quot;, totalAppointments=&quot; + totalAppointments +
+                &quot;, assignedAppointments=&quot; + assignedAppointments +
+                &quot;, unassignedAppointments=&quot; + unassignedAppointments +
+                &quot;, conflictCount=&quot; + conflictCount +
+                &quot;, utilizationRate=&quot; + utilizationRate +
+                &quot;, efficiencyScore=&quot; + efficiencyScore +
+                &quot;, totalScheduledTime=&quot; + totalScheduledTime +
+                &quot;, totalAvailableTime=&quot; + totalAvailableTime +
+                &quot;, resourceUtilization=&quot; + resourceUtilization +
+                &quot;, priorityDistribution=&quot; + priorityDistribution +
+                &quot;, typeDistribution=&quot; + typeDistribution +
+                '}';
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

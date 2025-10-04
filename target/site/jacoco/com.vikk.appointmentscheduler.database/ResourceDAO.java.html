@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ResourceDAO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Appointment Scheduling Optimizer</a> &gt; <a href="index.source.html" class="el_package">com.vikk.appointmentscheduler.database</a> &gt; <span class="el_source">ResourceDAO.java</span></div><h1>ResourceDAO.java</h1><pre class="source lang-java linenums">package com.vikk.appointmentscheduler.database;
+
+import com.vikk.appointmentscheduler.model.Resource;
+import com.vikk.appointmentscheduler.model.ResourceType;
+
+import java.sql.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Logger;
+
+/**
+ * Data Access Object for Resource entities.
+ */
+public class ResourceDAO {
+<span class="fc" id="L20">    private static final Logger logger = Logger.getLogger(ResourceDAO.class.getName());</span>
+<span class="fc" id="L21">    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd HH:mm:ss&quot;);</span>
+    private final DatabaseManager databaseManager;
+
+<span class="fc" id="L24">    public ResourceDAO() {</span>
+<span class="fc" id="L25">        this.databaseManager = DatabaseManager.getInstance();</span>
+<span class="fc" id="L26">    }</span>
+
+    public void save(Resource resource) throws SQLException {
+<span class="fc" id="L29">        String sql = &quot;&quot;&quot;</span>
+            INSERT OR REPLACE INTO resources 
+            (id, name, resource_type, cost_per_hour, capacity, is_active, 
+             available_from, available_to, setup_time_minutes, cleanup_time_minutes, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        &quot;&quot;&quot;;
+
+<span class="fc" id="L36">        try (Connection conn = databaseManager.getConnection();</span>
+<span class="fc" id="L37">             PreparedStatement stmt = conn.prepareStatement(sql)) {</span>
+            
+<span class="fc" id="L39">            stmt.setString(1, resource.getId());</span>
+<span class="fc" id="L40">            stmt.setString(2, resource.getName());</span>
+<span class="pc bpc" id="L41" title="1 of 2 branches missed.">            stmt.setString(3, resource.getType() != null ? </span>
+<span class="pc" id="L42">                resource.getType().name() : null);</span>
+<span class="fc" id="L43">            stmt.setDouble(4, resource.getCostPerHour());</span>
+<span class="fc" id="L44">            stmt.setInt(5, resource.getCapacity());</span>
+<span class="fc" id="L45">            stmt.setBoolean(6, resource.isActive());</span>
+<span class="fc bfc" id="L46" title="All 2 branches covered.">            stmt.setString(7, resource.getAvailableFrom() != null ? </span>
+<span class="fc" id="L47">                resource.getAvailableFrom().format(FORMATTER) : null);</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">            stmt.setString(8, resource.getAvailableTo() != null ? </span>
+<span class="fc" id="L49">                resource.getAvailableTo().format(FORMATTER) : null);</span>
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">            stmt.setLong(9, resource.getSetupTime() != null ? </span>
+<span class="pc" id="L51">                resource.getSetupTime().toMinutes() : 0);</span>
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">            stmt.setLong(10, resource.getCleanupTime() != null ? </span>
+<span class="pc" id="L53">                resource.getCleanupTime().toMinutes() : 0);</span>
+
+<span class="fc" id="L55">            stmt.executeUpdate();</span>
+            
+            // Save capabilities
+<span class="fc" id="L58">            saveCapabilities(resource.getId(), resource.getCapabilities());</span>
+            
+<span class="fc" id="L60">            logger.info(&quot;Saved resource: &quot; + resource.getId());</span>
+        }
+<span class="fc" id="L62">    }</span>
+
+    public Resource findById(String id) throws SQLException {
+<span class="fc" id="L65">        String sql = &quot;SELECT * FROM resources WHERE id = ?&quot;;</span>
+        
+<span class="fc" id="L67">        try (Connection conn = databaseManager.getConnection();</span>
+<span class="fc" id="L68">             PreparedStatement stmt = conn.prepareStatement(sql)) {</span>
+            
+<span class="fc" id="L70">            stmt.setString(1, id);</span>
+<span class="fc" id="L71">            ResultSet rs = stmt.executeQuery();</span>
+            
+<span class="fc bfc" id="L73" title="All 2 branches covered.">            if (rs.next()) {</span>
+<span class="fc" id="L74">                return mapResultSetToResource(rs);</span>
+            }
+<span class="pc bpc" id="L76" title="2 of 4 branches missed.">        }</span>
+<span class="fc" id="L77">        return null;</span>
+    }
+
+    public List&lt;Resource&gt; findAll() throws SQLException {
+<span class="fc" id="L81">        String sql = &quot;SELECT * FROM resources ORDER BY name&quot;;</span>
+<span class="fc" id="L82">        List&lt;Resource&gt; resources = new ArrayList&lt;&gt;();</span>
+        
+<span class="fc" id="L84">        try (Connection conn = databaseManager.getConnection();</span>
+<span class="fc" id="L85">             PreparedStatement stmt = conn.prepareStatement(sql);</span>
+<span class="fc" id="L86">             ResultSet rs = stmt.executeQuery()) {</span>
+            
+<span class="fc bfc" id="L88" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L89">                Resource resource = mapResultSetToResource(rs);</span>
+                // Load capabilities using the same connection
+<span class="fc" id="L91">                resource.setCapabilities(getCapabilities(conn, resource.getId()));</span>
+<span class="fc" id="L92">                resources.add(resource);</span>
+<span class="fc" id="L93">            }</span>
+        }
+<span class="fc" id="L95">        return resources;</span>
+    }
+
+    public List&lt;Resource&gt; findByType(ResourceType type) throws SQLException {
+<span class="fc" id="L99">        String sql = &quot;SELECT * FROM resources WHERE resource_type = ? ORDER BY name&quot;;</span>
+<span class="fc" id="L100">        List&lt;Resource&gt; resources = new ArrayList&lt;&gt;();</span>
+        
+<span class="fc" id="L102">        try (Connection conn = databaseManager.getConnection();</span>
+<span class="fc" id="L103">             PreparedStatement stmt = conn.prepareStatement(sql)) {</span>
+            
+<span class="fc" id="L105">            stmt.setString(1, type.name());</span>
+<span class="fc" id="L106">            ResultSet rs = stmt.executeQuery();</span>
+            
+<span class="fc bfc" id="L108" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L109">                Resource resource = mapResultSetToResource(rs);</span>
+                // Load capabilities using the same connection
+<span class="fc" id="L111">                resource.setCapabilities(getCapabilities(conn, resource.getId()));</span>
+<span class="fc" id="L112">                resources.add(resource);</span>
+<span class="fc" id="L113">            }</span>
+        }
+<span class="fc" id="L115">        return resources;</span>
+    }
+
+    public void update(Resource resource) throws SQLException {
+<span class="fc" id="L119">        String sql = &quot;&quot;&quot;</span>
+            UPDATE resources SET 
+                name = ?, resource_type = ?, cost_per_hour = ?, capacity = ?, 
+                is_active = ?, available_from = ?, available_to = ?, 
+                setup_time_minutes = ?, cleanup_time_minutes = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        &quot;&quot;&quot;;
+
+<span class="fc" id="L127">        try (Connection conn = databaseManager.getConnection();</span>
+<span class="fc" id="L128">             PreparedStatement stmt = conn.prepareStatement(sql)) {</span>
+            
+<span class="fc" id="L130">            stmt.setString(1, resource.getName());</span>
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">            stmt.setString(2, resource.getType() != null ? </span>
+<span class="pc" id="L132">                resource.getType().name() : null);</span>
+<span class="fc" id="L133">            stmt.setDouble(3, resource.getCostPerHour());</span>
+<span class="fc" id="L134">            stmt.setInt(4, resource.getCapacity());</span>
+<span class="fc" id="L135">            stmt.setBoolean(5, resource.isActive());</span>
+<span class="pc bpc" id="L136" title="1 of 2 branches missed.">            stmt.setString(6, resource.getAvailableFrom() != null ? </span>
+<span class="pc" id="L137">                resource.getAvailableFrom().format(FORMATTER) : null);</span>
+<span class="pc bpc" id="L138" title="1 of 2 branches missed.">            stmt.setString(7, resource.getAvailableTo() != null ? </span>
+<span class="pc" id="L139">                resource.getAvailableTo().format(FORMATTER) : null);</span>
+<span class="pc bpc" id="L140" title="1 of 2 branches missed.">            stmt.setLong(8, resource.getSetupTime() != null ? </span>
+<span class="pc" id="L141">                resource.getSetupTime().toMinutes() : 0);</span>
+<span class="pc bpc" id="L142" title="1 of 2 branches missed.">            stmt.setLong(9, resource.getCleanupTime() != null ? </span>
+<span class="pc" id="L143">                resource.getCleanupTime().toMinutes() : 0);</span>
+<span class="fc" id="L144">            stmt.setString(10, resource.getId());</span>
+
+<span class="fc" id="L146">            stmt.executeUpdate();</span>
+            
+            // Update capabilities
+<span class="fc" id="L149">            deleteCapabilities(resource.getId());</span>
+<span class="fc" id="L150">            saveCapabilities(resource.getId(), resource.getCapabilities());</span>
+            
+<span class="fc" id="L152">            logger.info(&quot;Updated resource: &quot; + resource.getId());</span>
+        }
+<span class="fc" id="L154">    }</span>
+
+    public void delete(String id) throws SQLException {
+<span class="fc" id="L157">        String sql = &quot;DELETE FROM resources WHERE id = ?&quot;;</span>
+        
+<span class="fc" id="L159">        try (Connection conn = databaseManager.getConnection();</span>
+<span class="fc" id="L160">             PreparedStatement stmt = conn.prepareStatement(sql)) {</span>
+            
+<span class="fc" id="L162">            stmt.setString(1, id);</span>
+<span class="fc" id="L163">            stmt.executeUpdate();</span>
+            
+            // Delete capabilities
+<span class="fc" id="L166">            deleteCapabilities(id);</span>
+            
+<span class="fc" id="L168">            logger.info(&quot;Deleted resource: &quot; + id);</span>
+        }
+<span class="fc" id="L170">    }</span>
+
+    public void deleteAll() throws SQLException {
+<span class="fc" id="L173">        String sql = &quot;DELETE FROM resources&quot;;</span>
+        
+<span class="fc" id="L175">        try (Connection conn = databaseManager.getConnection();</span>
+<span class="fc" id="L176">             PreparedStatement stmt = conn.prepareStatement(sql)) {</span>
+            
+<span class="fc" id="L178">            stmt.executeUpdate();</span>
+            
+            // Delete all capabilities
+<span class="fc" id="L181">            String deleteCapabilitiesSql = &quot;DELETE FROM resource_capabilities&quot;;</span>
+<span class="fc" id="L182">            try (PreparedStatement capStmt = conn.prepareStatement(deleteCapabilitiesSql)) {</span>
+<span class="fc" id="L183">                capStmt.executeUpdate();</span>
+            }
+            
+<span class="fc" id="L186">            logger.info(&quot;Deleted all resources&quot;);</span>
+        }
+<span class="fc" id="L188">    }</span>
+
+    private void saveCapabilities(String resourceId, Set&lt;String&gt; capabilities) throws SQLException {
+<span class="pc bpc" id="L191" title="1 of 4 branches missed.">        if (capabilities == null || capabilities.isEmpty()) return;</span>
+        
+<span class="fc" id="L193">        String sql = &quot;INSERT OR IGNORE INTO resource_capabilities (resource_id, capability) VALUES (?, ?)&quot;;</span>
+        
+<span class="fc" id="L195">        try (Connection conn = databaseManager.getConnection();</span>
+<span class="fc" id="L196">             PreparedStatement stmt = conn.prepareStatement(sql)) {</span>
+            
+<span class="fc bfc" id="L198" title="All 2 branches covered.">            for (String capability : capabilities) {</span>
+<span class="fc" id="L199">                stmt.setString(1, resourceId);</span>
+<span class="fc" id="L200">                stmt.setString(2, capability);</span>
+<span class="fc" id="L201">                stmt.addBatch();</span>
+<span class="fc" id="L202">            }</span>
+<span class="fc" id="L203">            stmt.executeBatch();</span>
+        }
+<span class="fc" id="L205">    }</span>
+
+    private void deleteCapabilities(String resourceId) throws SQLException {
+<span class="fc" id="L208">        String sql = &quot;DELETE FROM resource_capabilities WHERE resource_id = ?&quot;;</span>
+        
+<span class="fc" id="L210">        try (Connection conn = databaseManager.getConnection();</span>
+<span class="fc" id="L211">             PreparedStatement stmt = conn.prepareStatement(sql)) {</span>
+            
+<span class="fc" id="L213">            stmt.setString(1, resourceId);</span>
+<span class="fc" id="L214">            stmt.executeUpdate();</span>
+        }
+<span class="fc" id="L216">    }</span>
+
+    private Set&lt;String&gt; getCapabilities(String resourceId) throws SQLException {
+<span class="fc" id="L219">        try (Connection conn = databaseManager.getConnection()) {</span>
+<span class="fc" id="L220">            return getCapabilities(conn, resourceId);</span>
+        }
+    }
+    
+    private Set&lt;String&gt; getCapabilities(Connection conn, String resourceId) throws SQLException {
+<span class="fc" id="L225">        String sql = &quot;SELECT capability FROM resource_capabilities WHERE resource_id = ?&quot;;</span>
+<span class="fc" id="L226">        Set&lt;String&gt; capabilities = new HashSet&lt;&gt;();</span>
+        
+<span class="fc" id="L228">        try (PreparedStatement stmt = conn.prepareStatement(sql)) {</span>
+<span class="fc" id="L229">            stmt.setString(1, resourceId);</span>
+<span class="fc" id="L230">            ResultSet rs = stmt.executeQuery();</span>
+            
+<span class="fc bfc" id="L232" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L233">                capabilities.add(rs.getString(&quot;capability&quot;));</span>
+            }
+        }
+<span class="fc" id="L236">        return capabilities;</span>
+    }
+
+    private Resource mapResultSetToResource(ResultSet rs) throws SQLException {
+<span class="fc" id="L240">        Resource resource = new Resource();</span>
+        
+<span class="fc" id="L242">        resource.setId(rs.getString(&quot;id&quot;));</span>
+<span class="fc" id="L243">        resource.setName(rs.getString(&quot;name&quot;));</span>
+        
+<span class="fc" id="L245">        String typeStr = rs.getString(&quot;resource_type&quot;);</span>
+<span class="pc bpc" id="L246" title="1 of 2 branches missed.">        if (typeStr != null) {</span>
+<span class="fc" id="L247">            resource.setType(ResourceType.valueOf(typeStr));</span>
+        }
+        
+<span class="fc" id="L250">        resource.setCostPerHour(rs.getDouble(&quot;cost_per_hour&quot;));</span>
+<span class="fc" id="L251">        resource.setCapacity(rs.getInt(&quot;capacity&quot;));</span>
+<span class="fc" id="L252">        resource.setActive(rs.getBoolean(&quot;is_active&quot;));</span>
+        
+<span class="fc" id="L254">        String availableFromStr = rs.getString(&quot;available_from&quot;);</span>
+<span class="fc bfc" id="L255" title="All 2 branches covered.">        if (availableFromStr != null) {</span>
+<span class="fc" id="L256">            resource.setAvailableFrom(LocalDateTime.parse(availableFromStr, FORMATTER));</span>
+        }
+        
+<span class="fc" id="L259">        String availableToStr = rs.getString(&quot;available_to&quot;);</span>
+<span class="fc bfc" id="L260" title="All 2 branches covered.">        if (availableToStr != null) {</span>
+<span class="fc" id="L261">            resource.setAvailableTo(LocalDateTime.parse(availableToStr, FORMATTER));</span>
+        }
+        
+<span class="fc" id="L264">        long setupMinutes = rs.getLong(&quot;setup_time_minutes&quot;);</span>
+<span class="fc" id="L265">        resource.setSetupTime(Duration.ofMinutes(setupMinutes));</span>
+        
+<span class="fc" id="L267">        long cleanupMinutes = rs.getLong(&quot;cleanup_time_minutes&quot;);</span>
+<span class="fc" id="L268">        resource.setCleanupTime(Duration.ofMinutes(cleanupMinutes));</span>
+        
+        // Load capabilities
+<span class="fc" id="L271">        resource.setCapabilities(getCapabilities(resource.getId()));</span>
+        
+<span class="fc" id="L273">        return resource;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>
