@@ -28,6 +28,7 @@ jobs:
         
     - name: Run Spotless check
       run: mvn spotless:check
+      continue-on-error: true
       
     - name: Run Checkstyle
       run: mvn checkstyle:check

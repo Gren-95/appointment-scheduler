@@ -212,9 +212,10 @@
                     <java>
                         <eclipse>
                             <version>4.21.0</version>
-                            <file>eclipse-java-google-style.xml</file>
                         </eclipse>
                         <removeUnusedImports />
+                        <trimTrailingWhitespace />
+                        <endWithNewline />
                     </java>
                 </configuration>
             </plugin>
