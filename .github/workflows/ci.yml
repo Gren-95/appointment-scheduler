@@ -26,9 +26,10 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
         
-    - name: Run Spotless check
-      run: mvn spotless:check
-      continue-on-error: true
+    # Spotless check disabled due to dependency issues
+    # - name: Run Spotless check
+    #   run: mvn spotless:check
+    #   continue-on-error: true
       
     - name: Run Checkstyle
       run: mvn checkstyle:check
