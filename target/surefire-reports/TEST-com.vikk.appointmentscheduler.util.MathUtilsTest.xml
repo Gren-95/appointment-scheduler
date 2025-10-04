@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.vikk.appointmentscheduler.util.MathUtilsTest" time="0.008" tests="13" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="21"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.class.path" value="/mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/target/test-classes:/mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/target/classes:/home/ghost/.m2/repository/com/google/guava/guava/31.1-jre/guava-31.1-jre.jar:/home/ghost/.m2/repository/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar:/home/ghost/.m2/repository/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar:/home/ghost/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar:/home/ghost/.m2/repository/org/checkerframework/checker-qual/3.12.0/checker-qual-3.12.0.jar:/home/ghost/.m2/repository/com/google/errorprone/error_prone_annotations/2.11.0/error_prone_annotations-2.11.0.jar:/home/ghost/.m2/repository/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar:/home/ghost/.m2/repository/org/apache/commons/commons-lang3/3.12.0/commons-lang3-3.12.0.jar:/home/ghost/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.15.2/jackson-databind-2.15.2.jar:/home/ghost/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.15.2/jackson-annotations-2.15.2.jar:/home/ghost/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2.jar:/home/ghost/.m2/repository/org/openjfx/javafx-controls/17.0.2/javafx-controls-17.0.2.jar:/home/ghost/.m2/repository/org/openjfx/javafx-controls/17.0.2/javafx-controls-17.0.2-linux.jar:/home/ghost/.m2/repository/org/openjfx/javafx-graphics/17.0.2/javafx-graphics-17.0.2.jar:/home/ghost/.m2/repository/org/openjfx/javafx-graphics/17.0.2/javafx-graphics-17.0.2-linux.jar:/home/ghost/.m2/repository/org/openjfx/javafx-base/17.0.2/javafx-base-17.0.2.jar:/home/ghost/.m2/repository/org/openjfx/javafx-base/17.0.2/javafx-base-17.0.2-linux.jar:/home/ghost/.m2/repository/org/openjfx/javafx-fxml/17.0.2/javafx-fxml-17.0.2.jar:/home/ghost/.m2/repository/org/openjfx/javafx-fxml/17.0.2/javafx-fxml-17.0.2-linux.jar:/home/ghost/.m2/repository/org/openjfx/javafx-swing/17.0.2/javafx-swing-17.0.2.jar:/home/ghost/.m2/repository/org/openjfx/javafx-swing/17.0.2/javafx-swing-17.0.2-linux.jar:/home/ghost/.m2/repository/org/xerial/sqlite-jdbc/3.44.1.0/sqlite-jdbc-3.44.1.0.jar:/home/ghost/.m2/repository/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar:/home/ghost/.m2/repository/com/h2database/h2/2.2.224/h2-2.2.224.jar:/home/ghost/.m2/repository/org/junit/jupiter/junit-jupiter/5.9.3/junit-jupiter-5.9.3.jar:/home/ghost/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.9.3/junit-jupiter-api-5.9.3.jar:/home/ghost/.m2/repository/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar:/home/ghost/.m2/repository/org/junit/platform/junit-platform-commons/1.9.3/junit-platform-commons-1.9.3.jar:/home/ghost/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/ghost/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.9.3/junit-jupiter-params-5.9.3.jar:/home/ghost/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.9.3/junit-jupiter-engine-5.9.3.jar:/home/ghost/.m2/repository/org/junit/platform/junit-platform-engine/1.9.3/junit-platform-engine-1.9.3.jar:/home/ghost/.m2/repository/org/mockito/mockito-core/5.3.1/mockito-core-5.3.1.jar:/home/ghost/.m2/repository/net/bytebuddy/byte-buddy/1.14.4/byte-buddy-1.14.4.jar:/home/ghost/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.4/byte-buddy-agent-1.14.4.jar:/home/ghost/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/ghost/.m2/repository/org/mockito/mockito-junit-jupiter/5.3.1/mockito-junit-jupiter-5.3.1.jar:/home/ghost/.m2/repository/org/assertj/assertj-core/3.24.2/assertj-core-3.24.2.jar:"/>
+    <property name="java.vm.vendor" value="Red Hat, Inc."/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.vendor.url" value="https://www.redhat.com/"/>
+    <property name="user.timezone" value="Europe/Tallinn"/>
+    <property name="os.name" value="Linux"/>
+    <property name="java.vm.specification.version" value="21"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="US"/>
+    <property name="sun.boot.library.path" value="/usr/lib/jvm/java-21-openjdk/lib"/>
+    <property name="sun.java.command" value="/mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/target/surefire/surefirebooter-20251004172059964_3.jar /mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/target/surefire 2025-10-04T17-20-59_913-jvmRun1 surefire-20251004172059964_1tmp surefire_0-20251004172059964_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="test" value="!*Test.testAppointmentConflicts,!*Test.testCalculateEfficiencyScore,!*Test.testToString,!*Test.testEqualsAndHashCode,!*Test.testAppointmentWithConflicts,!*Test.testResourceWithAllFields,!*Test.testResourceWithConflicts,!*Test.testGetRegisteredAlgorithms,!*Test.testAlgorithmInitialization"/>
+    <property name="surefire.test.class.path" value="/mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/target/test-classes:/mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/target/classes:/home/ghost/.m2/repository/com/google/guava/guava/31.1-jre/guava-31.1-jre.jar:/home/ghost/.m2/repository/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar:/home/ghost/.m2/repository/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar:/home/ghost/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar:/home/ghost/.m2/repository/org/checkerframework/checker-qual/3.12.0/checker-qual-3.12.0.jar:/home/ghost/.m2/repository/com/google/errorprone/error_prone_annotations/2.11.0/error_prone_annotations-2.11.0.jar:/home/ghost/.m2/repository/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar:/home/ghost/.m2/repository/org/apache/commons/commons-lang3/3.12.0/commons-lang3-3.12.0.jar:/home/ghost/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.15.2/jackson-databind-2.15.2.jar:/home/ghost/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.15.2/jackson-annotations-2.15.2.jar:/home/ghost/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2.jar:/home/ghost/.m2/repository/org/openjfx/javafx-controls/17.0.2/javafx-controls-17.0.2.jar:/home/ghost/.m2/repository/org/openjfx/javafx-controls/17.0.2/javafx-controls-17.0.2-linux.jar:/home/ghost/.m2/repository/org/openjfx/javafx-graphics/17.0.2/javafx-graphics-17.0.2.jar:/home/ghost/.m2/repository/org/openjfx/javafx-graphics/17.0.2/javafx-graphics-17.0.2-linux.jar:/home/ghost/.m2/repository/org/openjfx/javafx-base/17.0.2/javafx-base-17.0.2.jar:/home/ghost/.m2/repository/org/openjfx/javafx-base/17.0.2/javafx-base-17.0.2-linux.jar:/home/ghost/.m2/repository/org/openjfx/javafx-fxml/17.0.2/javafx-fxml-17.0.2.jar:/home/ghost/.m2/repository/org/openjfx/javafx-fxml/17.0.2/javafx-fxml-17.0.2-linux.jar:/home/ghost/.m2/repository/org/openjfx/javafx-swing/17.0.2/javafx-swing-17.0.2.jar:/home/ghost/.m2/repository/org/openjfx/javafx-swing/17.0.2/javafx-swing-17.0.2-linux.jar:/home/ghost/.m2/repository/org/xerial/sqlite-jdbc/3.44.1.0/sqlite-jdbc-3.44.1.0.jar:/home/ghost/.m2/repository/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar:/home/ghost/.m2/repository/com/h2database/h2/2.2.224/h2-2.2.224.jar:/home/ghost/.m2/repository/org/junit/jupiter/junit-jupiter/5.9.3/junit-jupiter-5.9.3.jar:/home/ghost/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.9.3/junit-jupiter-api-5.9.3.jar:/home/ghost/.m2/repository/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar:/home/ghost/.m2/repository/org/junit/platform/junit-platform-commons/1.9.3/junit-platform-commons-1.9.3.jar:/home/ghost/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/ghost/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.9.3/junit-jupiter-params-5.9.3.jar:/home/ghost/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.9.3/junit-jupiter-engine-5.9.3.jar:/home/ghost/.m2/repository/org/junit/platform/junit-platform-engine/1.9.3/junit-platform-engine-1.9.3.jar:/home/ghost/.m2/repository/org/mockito/mockito-core/5.3.1/mockito-core-5.3.1.jar:/home/ghost/.m2/repository/net/bytebuddy/byte-buddy/1.14.4/byte-buddy-1.14.4.jar:/home/ghost/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.4/byte-buddy-agent-1.14.4.jar:/home/ghost/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/ghost/.m2/repository/org/mockito/mockito-junit-jupiter/5.3.1/mockito-junit-jupiter-5.3.1.jar:/home/ghost/.m2/repository/org/assertj/assertj-core/3.24.2/assertj-core-3.24.2.jar:"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="/home/ghost"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2025-07-15"/>
+    <property name="java.home" value="/usr/lib/jvm/java-21-openjdk"/>
+    <property name="file.separator" value="/"/>
+    <property name="basedir" value="/mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="surefire.real.class.path" value="/mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler/target/surefire/surefirebooter-20251004172059964_3.jar"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="21.0.8+9"/>
+    <property name="user.name" value="ghost"/>
+    <property name="stdout.encoding" value="UTF-8"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="6.16.9-200.nobara.fc42.x86_64"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="java.vendor.version" value="(Red_Hat-21.0.8.0.9-1)"/>
+    <property name="localRepository" value="/home/ghost/.m2/repository"/>
+    <property name="java.vendor.url.bug" value="https://bugzilla.redhat.com/enter_bug.cgi?product=Fedora&amp;component=java-21-openjdk&amp;version=41"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="java.version" value="21.0.8"/>
+    <property name="user.dir" value="/mnt/DATA/Home_Folders/Documents/Code/Vikk/appointment-scheduler"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="native.encoding" value="UTF-8"/>
+    <property name="java.library.path" value="/tmp/.mount_CursortueSsR/usr/lib/:/tmp/.mount_CursortueSsR/usr/lib32/:/tmp/.mount_CursortueSsR/usr/lib64/:/tmp/.mount_CursortueSsR/lib/:/tmp/.mount_CursortueSsR/lib/i386-linux-gnu/:/tmp/.mount_CursortueSsR/lib/x86_64-linux-gnu/:/tmp/.mount_CursortueSsR/lib/aarch64-linux-gnu/:/tmp/.mount_CursortueSsR/lib32/:/tmp/.mount_CursortueSsR/lib64/::/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib"/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="stderr.encoding" value="UTF-8"/>
+    <property name="java.vendor" value="Red Hat, Inc."/>
+    <property name="java.vm.version" value="21.0.8+9"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="65.0"/>
+  </properties>
+  <testcase name="testSetOperations" classname="com.vikk.appointmentscheduler.util.MathUtilsTest" time="0.001"/>
+  <testcase name="testSchedulingSpecificFunctions" classname="com.vikk.appointmentscheduler.util.MathUtilsTest" time="0.0"/>
+  <testcase name="testEdgeCasesAndErrorHandling" classname="com.vikk.appointmentscheduler.util.MathUtilsTest" time="0.001"/>
+  <testcase name="testAbs" classname="com.vikk.appointmentscheduler.util.MathUtilsTest" time="0.0"/>
+  <testcase name="testMinMaxCollections" classname="com.vikk.appointmentscheduler.util.MathUtilsTest" time="0.0"/>
+  <testcase name="testStatisticalFunctions" classname="com.vikk.appointmentscheduler.util.MathUtilsTest" time="0.002"/>
+  <testcase name="testMinMaxVarargs" classname="com.vikk.appointmentscheduler.util.MathUtilsTest" time="0.0"/>
+  <testcase name="testBooleanLogic" classname="com.vikk.appointmentscheduler.util.MathUtilsTest" time="0.0"/>
+  <testcase name="testConstraintSatisfactionHelpers" classname="com.vikk.appointmentscheduler.util.MathUtilsTest" time="0.001"/>
+  <testcase name="testRounding" classname="com.vikk.appointmentscheduler.util.MathUtilsTest" time="0.0"/>
+  <testcase name="testModulo" classname="com.vikk.appointmentscheduler.util.MathUtilsTest" time="0.0"/>
+  <testcase name="testDateTimeCalculations" classname="com.vikk.appointmentscheduler.util.MathUtilsTest" time="0.0"/>
+  <testcase name="testOptimizationHelpers" classname="com.vikk.appointmentscheduler.util.MathUtilsTest" time="0.0"/>
+</testsuite>
