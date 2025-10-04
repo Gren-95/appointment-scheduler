@@ -190,8 +190,12 @@ public class ScheduleMetrics {
     
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ScheduleMetrics that = (ScheduleMetrics) o;
         return Double.compare(that.totalCost, totalCost) == 0 &&
                 Double.compare(that.averageCostPerAppointment, averageCostPerAppointment) == 0 &&

@@ -5,7 +5,11 @@ import com.vikk.appointmentscheduler.model.AppointmentStatus;
 import com.vikk.appointmentscheduler.model.AppointmentType;
 import com.vikk.appointmentscheduler.model.Priority;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

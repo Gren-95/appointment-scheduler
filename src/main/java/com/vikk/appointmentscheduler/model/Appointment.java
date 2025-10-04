@@ -30,6 +30,9 @@ public class Appointment {
     private double importanceScore;
     private AppointmentStatus status;
 
+    /**
+     * Default constructor that initializes the appointment with default values.
+     */
     public Appointment() {
         this.requiredCapabilities = new HashSet<>();
         this.preferredCapabilities = new HashSet<>();
@@ -39,6 +42,14 @@ public class Appointment {
         this.importanceScore = 1.0;
     }
 
+    /**
+     * Constructor that creates an appointment with the specified parameters.
+     *
+     * @param id the unique identifier for the appointment
+     * @param title the title of the appointment
+     * @param startTime the start time of the appointment
+     * @param duration the duration of the appointment
+     */
     public Appointment(String id, String title, LocalDateTime startTime, Duration duration) {
         this();
         this.id = id;
@@ -244,8 +255,12 @@ public class Appointment {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Appointment that = (Appointment) o;
         return Objects.equals(id, that.id);
     }

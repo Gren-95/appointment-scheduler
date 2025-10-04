@@ -48,7 +48,9 @@ public class ConstraintSatisfactionAlgorithm implements SchedulingAlgorithm {
         // Sort appointments by priority and importance for better constraint propagation
         appointments.sort((a1, a2) -> {
             int priorityCompare = a2.getPriority().getLevel() - a1.getPriority().getLevel();
-            if (priorityCompare != 0) return priorityCompare;
+            if (priorityCompare != 0) {
+                return priorityCompare;
+            }
             return Double.compare(a2.calculateScore(), a1.calculateScore());
         });
         
